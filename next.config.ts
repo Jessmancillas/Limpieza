@@ -10,6 +10,9 @@ const nextConfig: NextConfig = {
       // Los anexos PDF se suben por server actions.
       bodySizeLimit: "30mb",
     },
+    // src/proxy.ts aplica a todas las rutas: sin esto, Next solo guarda 10 MB del cuerpo
+    // y las subidas grandes llegarían cortadas a las server actions.
+    proxyClientMaxBodySize: "30mb",
   },
   turbopack: {
     rules: {

@@ -28,6 +28,9 @@ export const LIMITES_ESTABLECIMIENTO = {
   scianDescripcion: 500,
 } as const;
 
+/** Tope de claves SCIAN por establecimiento (el manual admite "N"; evita envíos desmedidos). */
+export const MAX_SCIAN = 50;
+
 const vacioAUndefined = (v: unknown) => (typeof v === "string" && v.trim() === "" ? undefined : v);
 const opcional = (max: number) =>
   z.preprocess(vacioAUndefined, z.string().trim().max(max, `Máximo ${max} caracteres`).optional());
@@ -58,7 +61,10 @@ export const esquemaEstablecimiento = z
     localidad: opcional(LIMITES_ESTABLECIMIENTO.localidad),
     noLicenciaSanitaria: opcional(LIMITES_ESTABLECIMIENTO.noLicenciaSanitaria),
     tieneAvisoFuncionamiento: zCheckbox,
-    scian: z.array(esquemaScian, { error: "Agrega al menos una clave SCIAN" }).min(1, "Agrega al menos una clave SCIAN"),
+    scian: z
+      .array(esquemaScian, { error: "Agrega al menos una clave SCIAN" })
+      .min(1, "Agrega al menos una clave SCIAN")
+      .max(MAX_SCIAN, `Máximo ${MAX_SCIAN} claves SCIAN por establecimiento`),
   })
   .superRefine((d, ctx) => {
     // En el portal la licencia sanitaria y el aviso de funcionamiento son excluyentes.

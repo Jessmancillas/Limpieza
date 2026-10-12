@@ -21,6 +21,9 @@ export function passwordSimulador(): string {
   return process.env.VUCEM_SIMULADOR_PASSWORD ?? "simulador-vucem";
 }
 
+/** Tamaño máximo de una petición al simulador (un PDF de 10 MB ocupa ~13.4 MB en base64). */
+export const MAX_BYTES_PETICION = 25 * 1024 * 1024;
+
 /** Tiempo que una digitalización se reporta "en proceso" antes de entregar el eDocument. */
 export const DEMORA_DIGITALIZACION_MS = 4_000;
 
@@ -295,6 +298,16 @@ export function procesarSolicitud(xml: string, opciones: { ahora?: Date } = {}):
     if (e instanceof FaultSimulador) return fault(e);
     return fault(new FaultSimulador(e instanceof Error ? e.message : "Error interno del simulador.", "soapenv:Server"));
   }
+}
+
+/** Atiende un POST del route handler: deshabilitado (404), demasiado grande (413) o procesado. */
+export async function atenderPeticion(request: Request, procesar: (xml: string) => RespuestaSimulador): Promise<Response> {
+  if (!simuladorHabilitado()) return new Response("No encontrado", { status: 404 });
+  const longitud = Number(request.headers.get("content-length") ?? "0");
+  if (longitud > MAX_BYTES_PETICION) return new Response("Petición demasiado grande", { status: 413 });
+  const xml = await request.text();
+  if (xml.length > MAX_BYTES_PETICION) return new Response("Petición demasiado grande", { status: 413 });
+  return respuestaHttp(procesar(xml));
 }
 
 /** Respuesta HTTP del route handler. */

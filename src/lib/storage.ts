@@ -7,12 +7,12 @@ import { tokenAleatorio } from "@/lib/crypto";
 
 /** Carpeta privada de archivos (fuera de /public). */
 export function carpetaAlmacen(): string {
-  return path.resolve(process.env.STORAGE_DIR ?? "./storage");
+  return path.resolve(/*turbopackIgnore: true*/ process.env.STORAGE_DIR ?? "./storage");
 }
 
 function resolverSeguro(rutaRelativa: string): string {
   const base = carpetaAlmacen();
-  const completa = path.resolve(base, rutaRelativa);
+  const completa = path.resolve(/*turbopackIgnore: true*/ base, rutaRelativa);
   if (!completa.startsWith(base + path.sep)) {
     throw new Error("Ruta de archivo inválida.");
   }

@@ -10,6 +10,7 @@ import { erroresDeZod, formDataAObjeto, type EstadoFormulario } from "@/lib/form
 import { denominacionCopia, esquemaProducto } from "@/lib/validacion/producto";
 
 import {
+  esIdValido,
   MENSAJE_NO_ENCONTRADO,
   MENSAJE_REVISA,
   plural,
@@ -22,6 +23,7 @@ export async function guardarProducto(id: string | null, _previo: EstadoFormular
   const ctx = await obtenerContexto();
   const sinPermiso = sinPermisoEdicion(ctx);
   if (sinPermiso) return sinPermiso;
+  if (id !== null && !esIdValido(id)) return { ok: false, mensaje: MENSAJE_NO_ENCONTRADO };
   const empresaId = ctx.empresa.id;
 
   const valores = formDataAObjeto(formData);
@@ -108,6 +110,7 @@ export async function duplicarProducto(id: string): Promise<EstadoFormulario> {
   const ctx = await obtenerContexto();
   const sinPermiso = sinPermisoEdicion(ctx);
   if (sinPermiso) return sinPermiso;
+  if (!esIdValido(id)) return { ok: false, mensaje: MENSAJE_NO_ENCONTRADO };
   const empresaId = ctx.empresa.id;
 
   const original = await db.producto.findFirst({ where: { id, empresaId } });
@@ -156,6 +159,7 @@ export async function cambiarActivoProducto(id: string): Promise<EstadoFormulari
   const ctx = await obtenerContexto();
   const sinPermiso = sinPermisoEdicion(ctx);
   if (sinPermiso) return sinPermiso;
+  if (!esIdValido(id)) return { ok: false, mensaje: MENSAJE_NO_ENCONTRADO };
 
   const p = await db.producto.findFirst({ where: { id, empresaId: ctx.empresa.id }, select: { id: true, activo: true } });
   if (!p) return { ok: false, mensaje: MENSAJE_NO_ENCONTRADO };
@@ -177,6 +181,7 @@ export async function eliminarProducto(id: string): Promise<EstadoFormulario> {
   const ctx = await obtenerContexto();
   const sinPermiso = sinPermisoEdicion(ctx);
   if (sinPermiso) return sinPermiso;
+  if (!esIdValido(id)) return { ok: false, mensaje: MENSAJE_NO_ENCONTRADO };
 
   const p = await db.producto.findFirst({
     where: { id, empresaId: ctx.empresa.id },

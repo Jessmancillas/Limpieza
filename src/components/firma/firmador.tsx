@@ -138,7 +138,9 @@ export function Firmador({
     } finally {
       bytes?.fill(0);
       bytes = null;
-      limpiarLlave();
+      // La contraseña se borra siempre; el archivo .key solo si se firmó (para reintentar la contraseña).
+      if (resultado) limpiarLlave();
+      else setPassword("");
     }
     try {
       if (resultado) await onFirmado(resultado);

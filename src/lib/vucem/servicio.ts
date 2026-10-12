@@ -350,6 +350,62 @@ export async function consultarDigitalizacion(p: {
 
 const enviosEnCurso = ((globalThis as { __enviosVucemEnCurso?: Set<string> }).__enviosVucemEnCurso ??= new Set<string>());
 
+export type EDocumentDeOtroAmbiente = { documentoId: string; nombre: string; eDocument: string; ambiente: string };
+
+/**
+ * eDocuments que se generaron en otro ambiente (p. ej. en el SIMULADOR) y que no sirven para el
+ * actual. El origen se toma de la consulta exitosa que entregó ese eDocument (EnvioVucem).
+ * En el SIMULADOR se acepta cualquiera.
+ */
+export async function eDocumentsDeOtroAmbiente(
+  empresaId: string,
+  documentos: Array<Pick<Documento, "id" | "nombre" | "eDocument">>,
+  ambiente: AmbienteVucem,
+): Promise<EDocumentDeOtroAmbiente[]> {
+  if (ambiente === "SIMULADOR") return [];
+  const conEDocument = documentos.filter((d) => d.eDocument);
+  if (conEDocument.length === 0) return [];
+  const consultas = await db.envioVucem.findMany({
+    where: { empresaId, documentoId: { in: conEDocument.map((d) => d.id) }, tipo: "DIGITALIZACION_CONSULTA", exito: true },
+    select: { documentoId: true, resultado: true, ambiente: true },
+    orderBy: { creadoEn: "desc" },
+  });
+  const ajenos: EDocumentDeOtroAmbiente[] = [];
+  for (const d of conEDocument) {
+    const origen = consultas.find((c) => c.documentoId === d.id && c.resultado === d.eDocument);
+    if (origen && origen.ambiente !== ambiente) {
+      ajenos.push({ documentoId: d.id, nombre: d.nombre, eDocument: d.eDocument as string, ambiente: origen.ambiente });
+    }
+  }
+  return ajenos;
+}
+
+/** Quita un eDocument (p. ej. uno del simulador) para poder digitalizar el documento de nuevo. */
+export async function descartarEDocument(empresaId: string, documentoId: string, usuarioId: string, motivo: string): Promise<boolean> {
+  const doc = await db.documento.findFirst({ where: { id: documentoId, empresaId }, select: { eDocument: true, numeroOperacionEDoc: true } });
+  if (!doc?.eDocument) return false;
+  await db.documento.update({
+    where: { id: documentoId },
+    data: {
+      estadoEDocument: "NO_ENVIADO",
+      eDocument: null,
+      numeroOperacionEDoc: null,
+      numeroTramiteEDoc: null,
+      errorEDocument: null,
+      eDocumentFecha: null,
+    },
+  });
+  await registrarBitacora({
+    empresaId,
+    usuarioId,
+    accion: "DESCARTAR_EDOCUMENT",
+    entidad: "Documento",
+    entidadId: documentoId,
+    detalle: { eDocumentAnterior: doc.eDocument, numeroOperacion: doc.numeroOperacionEDoc, motivo },
+  });
+  return true;
+}
+
 /** Motivos que impiden enviar la solicitud por WS (sin contar la firma). */
 export function bloqueosEnvio(sol: SolicitudCompleta, config: ConfiguracionVucemEfectiva, hoy: Date = new Date()): string[] {
   const bloqueos: string[] = [];
@@ -396,6 +452,9 @@ async function enviarSolicitudInterno(p: Parameters<typeof enviarSolicitud260211
   if (!sol) return { ok: false, mensaje: "La solicitud no existe o no pertenece a la empresa activa." };
 
   const bloqueos = bloqueosEnvio(sol, config);
+  for (const e of await eDocumentsDeOtroAmbiente(p.empresaId, sol.documentos.map((sd) => sd.documento), config.ambiente)) {
+    bloqueos.push(`El eDocument de «${e.nombre}» se generó en ${e.ambiente}: descártalo y digitalízalo de nuevo.`);
+  }
   if (bloqueos.length > 0) return { ok: false, mensaje: "No se puede enviar todavía.", detalles: bloqueos };
   if (envioPrevioSinFolio(sol) && !p.confirmarReenvio) {
     return {

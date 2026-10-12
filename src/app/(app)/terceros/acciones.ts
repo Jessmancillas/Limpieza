@@ -11,6 +11,7 @@ import { datosTerceroParaGuardar, esquemaTercero, nombreTercero } from "@/lib/va
 
 import { rutaVolverSegura } from "../establecimientos/_compartido/rutas";
 import {
+  esIdValido,
   MENSAJE_NO_ENCONTRADO,
   MENSAJE_REVISA,
   plural,
@@ -23,6 +24,7 @@ export async function guardarTercero(id: string | null, _previo: EstadoFormulari
   const ctx = await obtenerContexto();
   const sinPermiso = sinPermisoEdicion(ctx);
   if (sinPermiso) return sinPermiso;
+  if (id !== null && !esIdValido(id)) return { ok: false, mensaje: MENSAJE_NO_ENCONTRADO };
 
   const valores = formDataAObjeto(formData);
   const resultado = esquemaTercero.safeParse(valores);
@@ -64,6 +66,9 @@ export async function guardarTercero(id: string | null, _previo: EstadoFormulari
     });
     revalidatePath("/terceros");
     revalidatePath(`/terceros/${existente.id}`);
+    // Productos y solicitudes muestran los datos vigentes del tercero.
+    revalidatePath("/productos", "layout");
+    revalidatePath("/solicitudes", "layout");
     return { ok: true, mensaje: "Cambios guardados." };
   }
 
@@ -90,6 +95,7 @@ export async function cambiarActivoTercero(id: string): Promise<EstadoFormulario
   const ctx = await obtenerContexto();
   const sinPermiso = sinPermisoEdicion(ctx);
   if (sinPermiso) return sinPermiso;
+  if (!esIdValido(id)) return { ok: false, mensaje: MENSAJE_NO_ENCONTRADO };
 
   const t = await db.tercero.findFirst({ where: { id, empresaId: ctx.empresa.id }, select: { id: true, activo: true } });
   if (!t) return { ok: false, mensaje: MENSAJE_NO_ENCONTRADO };
@@ -111,6 +117,7 @@ export async function eliminarTercero(id: string): Promise<EstadoFormulario> {
   const ctx = await obtenerContexto();
   const sinPermiso = sinPermisoEdicion(ctx);
   if (sinPermiso) return sinPermiso;
+  if (!esIdValido(id)) return { ok: false, mensaje: MENSAJE_NO_ENCONTRADO };
 
   const t = await db.tercero.findFirst({
     where: { id, empresaId: ctx.empresa.id },

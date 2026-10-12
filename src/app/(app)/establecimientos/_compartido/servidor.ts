@@ -8,6 +8,15 @@ import type { EstadoFormulario } from "@/lib/formularios";
 export const MENSAJE_REVISA = "Revisa los campos marcados.";
 export const MENSAJE_NO_ENCONTRADO = "El registro no existe o no pertenece a la empresa activa.";
 
+/**
+ * Los ids de las acciones llegan como argumentos ligados (.bind) que viajan al navegador y
+ * regresan sin cifrar: el cliente puede alterarlos. Solo se aceptan textos cortos (además, cada
+ * acción verifica que el registro pertenezca a la empresa activa).
+ */
+export function esIdValido(id: unknown): id is string {
+  return typeof id === "string" && id.length > 0 && id.length <= 64;
+}
+
 /** null si el usuario puede modificar datos; si no, el estado con el mensaje de permiso. */
 export function sinPermisoEdicion(ctx: Contexto): EstadoFormulario | null {
   try {

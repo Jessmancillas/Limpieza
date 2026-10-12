@@ -113,6 +113,9 @@ export const esquemaTercero = z
     if (!esDestinatario) requerido("correoElectronico", "El correo electrónico es obligatorio");
 
     // Domicilio
+    if (!esNacional && d.pais === "MEX") {
+      error("pais", "Si el domicilio está en México, elige la nacionalidad «Nacional» para capturar el domicilio mexicano");
+    }
     if (esNacional) {
       if (d.pais !== "MEX") error("pais", "Un tercero nacional debe tener país MEX (México)");
       requerido("entidadFederativa", "Selecciona la entidad federativa");

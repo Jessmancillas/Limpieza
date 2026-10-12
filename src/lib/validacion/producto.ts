@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { zFechaOpcional, zFraccion, zTexto } from "./comunes";
+import { zFraccion, zTexto } from "./comunes";
 
 // Datos de la mercancía: campos 19-37 del Manual WS 260211 (los que no dependen de la solicitud).
 //  19 idClasificacionProducto SI Long 14 · 20 idSubClasificacionProducto SI Long 14 ·
@@ -34,6 +34,30 @@ const vacioAUndefined = (v: unknown) => (typeof v === "string" && v.trim() === "
 const opcional = (max: number) =>
   z.preprocess(vacioAUndefined, z.string().trim().max(max, `Máximo ${max} caracteres`).optional());
 
+/** Campos tipo Long del manual (19, 20 y 24): clave numérica. */
+const claveNumerica = (max: number, mensaje: string) =>
+  zTexto(max, mensaje).refine((v) => v === "" || /^\d+$/.test(v), "La clave debe ser numérica (así la define el manual de VUCEM)");
+
+/** true si "aaaa-mm-dd" es un día que existe en el calendario (rechaza 2025-02-31 o 2025-13-01). */
+export function esFechaReal(texto: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(texto)) return false;
+  const anio = Number(texto.slice(0, 4));
+  if (anio < 1900 || anio > 2200) return false;
+  const fecha = new Date(`${texto}T12:00:00.000Z`);
+  return !Number.isNaN(fecha.getTime()) && fecha.toISOString().slice(0, 10) === texto;
+}
+
+/** Fecha opcional de <input type="date"> → Date a mediodía UTC (sin desfases por zona horaria). */
+const zFechaVigencia = z.preprocess(
+  vacioAUndefined,
+  z
+    .string()
+    .trim()
+    .refine(esFechaReal, "Fecha inválida")
+    .transform((v) => new Date(`${v}T12:00:00.000Z`))
+    .optional(),
+);
+
 export const esquemaProducto = z
   .object({
     denominacionEspecifica: zTexto(LIMITES_PRODUCTO.denominacionEspecifica, "La denominación específica es obligatoria"),
@@ -42,9 +66,9 @@ export const esquemaProducto = z
       LIMITES_PRODUCTO.denominacionComunCientifica,
       "La denominación común o nombre científico es obligatorio",
     ),
-    idClasificacionProducto: zTexto(LIMITES_PRODUCTO.idClasificacionProducto, "Selecciona la clasificación del producto"),
-    idSubClasificacionProducto: zTexto(LIMITES_PRODUCTO.idSubClasificacionProducto, "Selecciona la subclasificación del producto"),
-    idTipoProducto: zTexto(LIMITES_PRODUCTO.idTipoProducto, "Selecciona el tipo de producto"),
+    idClasificacionProducto: claveNumerica(LIMITES_PRODUCTO.idClasificacionProducto, "Selecciona la clasificación del producto"),
+    idSubClasificacionProducto: claveNumerica(LIMITES_PRODUCTO.idSubClasificacionProducto, "Selecciona la subclasificación del producto"),
+    idTipoProducto: claveNumerica(LIMITES_PRODUCTO.idTipoProducto, "Selecciona el tipo de producto"),
     especifique: opcional(LIMITES_PRODUCTO.especifique),
     idFormaFarmaceutica: opcional(LIMITES_PRODUCTO.idFormaFarmaceutica),
     idEstadoFisico: opcional(LIMITES_PRODUCTO.idEstadoFisico),
@@ -55,7 +79,7 @@ export const esquemaProducto = z
     desUMC: zTexto(LIMITES_PRODUCTO.desUMC, "La descripción de la unidad de medida comercial es obligatoria"),
     presentacionTipoEnvase: zTexto(LIMITES_PRODUCTO.presentacionTipoEnvase, "La presentación o tipo de envase es obligatoria"),
     numRegistroSanitario: opcional(LIMITES_PRODUCTO.numRegistroSanitario),
-    vigenciaRegistroSanitario: zFechaOpcional,
+    vigenciaRegistroSanitario: zFechaVigencia,
     cvePaisOrigen: z
       .string({ error: "Selecciona el país de origen" })
       .trim()

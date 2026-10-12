@@ -14,7 +14,11 @@ import { borrarCredencial, guardarCredencial } from "@/lib/vucem/credenciales";
 const RUTA = "/configuracion/vucem";
 const SIN_PERMISO = "Solo un administrador puede modificar la conexión con VUCEM.";
 
-const vacioANull = (v: unknown) => (typeof v === "string" && v.trim() === "" ? null : typeof v === "string" ? v.trim() : v);
+const vacioANull = (v: unknown) => {
+  if (v === undefined || v === null) return null;
+  if (typeof v !== "string") return v;
+  return v.trim() === "" ? null : v.trim();
+};
 
 const zUrlHttps = z.preprocess(
   vacioANull,

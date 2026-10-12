@@ -12,7 +12,7 @@ import { cargarSolicitudCompleta } from "@/lib/solicitudes/consultas";
 import { validarSolicitud } from "@/lib/solicitudes/validacion";
 import { obtenerConfiguracionVucem } from "@/lib/vucem/configuracion";
 import { tieneCredencial } from "@/lib/vucem/credenciales";
-import { bloqueosEnvio, envioPrevioSinFolio, motivoNoDigitalizable } from "@/lib/vucem/servicio";
+import { bloqueosEnvio, eDocumentsDeOtroAmbiente, envioPrevioSinFolio, motivoNoDigitalizable } from "@/lib/vucem/servicio";
 import {
   construirCadenaOriginal260211,
   construirPayload260211,
@@ -20,6 +20,7 @@ import {
   xmlVistaPrevia260211,
 } from "@/lib/vucem/solicitud-260211";
 
+import { BotonDescartarEDocument } from "./boton-descartar";
 import { ETIQUETA_ESTADO_EDOCUMENT, ETIQUETA_TIPO_ENVIO, TONO_ESTADO_EDOCUMENT, formatearXml } from "./formato";
 import { FormularioTipoDocumento } from "./formulario-tipo-documento";
 import { PanelDigitalizacion } from "./panel-digitalizacion";
@@ -80,6 +81,9 @@ export default async function PaginaEnvioVucem({ params }: { params: Promise<{ i
 
   const bloqueos = bloqueosEnvio(sol, config);
   if (faltaCredencial) bloqueos.push("Falta la contraseña de servicios web (Configuración → Conexión VUCEM).");
+  const ajenos = await eDocumentsDeOtroAmbiente(ctx.empresa.id, sol.documentos.map((sd) => sd.documento), config.ambiente);
+  const ambienteAjeno = new Map(ajenos.map((a) => [a.documentoId, a.ambiente]));
+  for (const a of ajenos) bloqueos.push(`El eDocument de «${a.nombre}» se generó en ${a.ambiente}: descártalo y digitalízalo de nuevo.`);
   const previoSinFolio = envioPrevioSinFolio(sol);
 
   const documentos = sol.documentos.map((sd) => ({ ...sd.documento, motivo: motivoNoDigitalizable(sd.documento) }));
@@ -221,6 +225,14 @@ export default async function PaginaEnvioVucem({ params }: { params: Promise<{ i
                               <code className="font-mono text-xs">{d.eDocument}</code>
                               <BotonCopiar valor={d.eDocument} />
                             </p>
+                          )}
+                          {ambienteAjeno.has(d.id) && (
+                            <div className="space-y-1">
+                              <Insignia tono="aviso">Generado en {ambienteAjeno.get(d.id)}</Insignia>
+                              {puedeEditar && !sol.folioVucem && (
+                                <BotonDescartarEDocument solicitudId={sol.id} documentoId={d.id} ambiente={ambienteAjeno.get(d.id) ?? ""} />
+                              )}
+                            </div>
                           )}
                           {d.estadoEDocument === "PENDIENTE" && d.numeroOperacionEDoc && (
                             <p className="text-xs text-texto-suave">Operación {d.numeroOperacionEDoc}</p>

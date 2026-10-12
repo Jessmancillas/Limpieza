@@ -15,6 +15,8 @@ import {
   cadenaDeDocumento,
   consultarDigitalizacion,
   credencialParaEnvio,
+  descartarEDocument,
+  eDocumentsDeOtroAmbiente,
   enviarSolicitud260211,
   motivoNoDigitalizable,
   registrarDigitalizacion,
@@ -278,6 +280,27 @@ export async function guardarTipoDocumentoVucem(_previo: EstadoFormulario, formD
   rutas(r.data.solicitudId);
   revalidatePath(`/documentos/${liga.documento.id}`);
   return { ok: true, mensaje: "Tipo de documento guardado." };
+}
+
+const esquemaDescartar = z.object({ solicitudId: zId, documentoId: zId });
+
+/** Descarta un eDocument generado en otro ambiente (p. ej. el SIMULADOR) para volver a digitalizar. */
+export async function descartarEDocumentDeOtroAmbiente(_previo: EstadoFormulario, formData: FormData): Promise<EstadoFormulario> {
+  const r = esquemaDescartar.safeParse(formDataAObjeto(formData));
+  if (!r.success) return { ok: false, mensaje: "Datos inválidos." };
+  const a = await acceso(r.data.solicitudId);
+  if ("error" in a) return { ok: false, mensaje: a.error };
+  const { ctx } = a;
+  const sol = await db.solicitud.findFirst({ where: { id: r.data.solicitudId, empresaId: ctx.empresa.id }, select: { folioVucem: true } });
+  if (sol?.folioVucem) return { ok: false, mensaje: "La solicitud ya se presentó; no se modifican sus anexos." };
+  const documentos = await documentosDeSolicitud(r.data.solicitudId, ctx.empresa.id);
+  const config = await obtenerConfiguracionVucem(ctx.empresa.id);
+  const ajeno = (await eDocumentsDeOtroAmbiente(ctx.empresa.id, documentos, config.ambiente)).find((e) => e.documentoId === r.data.documentoId);
+  if (!ajeno) return { ok: false, mensaje: "Ese eDocument es del ambiente actual; no se descarta." };
+  await descartarEDocument(ctx.empresa.id, ajeno.documentoId, ctx.usuario.id, `Generado en ${ajeno.ambiente}; ambiente actual ${config.ambiente}`);
+  rutas(r.data.solicitudId);
+  revalidatePath(`/documentos/${ajeno.documentoId}`);
+  return { ok: true, mensaje: "eDocument descartado: ya puedes digitalizarlo de nuevo." };
 }
 
 const esquemaEnvio = z.object({

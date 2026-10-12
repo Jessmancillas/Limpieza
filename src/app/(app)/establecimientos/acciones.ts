@@ -9,7 +9,14 @@ import { db } from "@/lib/db";
 import { erroresDeZod, type EstadoFormulario } from "@/lib/formularios";
 import { entradaEstablecimientoDesdeFormData, esquemaEstablecimiento } from "@/lib/validacion/establecimiento";
 
-import { MENSAJE_NO_ENCONTRADO, MENSAJE_REVISA, plural, sinPermisoEdicion, validarClavesCatalogo } from "./_compartido/servidor";
+import {
+  esIdValido,
+  MENSAJE_NO_ENCONTRADO,
+  MENSAJE_REVISA,
+  plural,
+  sinPermisoEdicion,
+  validarClavesCatalogo,
+} from "./_compartido/servidor";
 
 /** Alta (id = null) o edición de un establecimiento con sus claves SCIAN. */
 export async function guardarEstablecimiento(
@@ -20,6 +27,7 @@ export async function guardarEstablecimiento(
   const ctx = await obtenerContexto();
   const sinPermiso = sinPermisoEdicion(ctx);
   if (sinPermiso) return sinPermiso;
+  if (id !== null && !esIdValido(id)) return { ok: false, mensaje: MENSAJE_NO_ENCONTRADO };
 
   const { valores, entrada } = entradaEstablecimientoDesdeFormData(formData);
   const resultado = esquemaEstablecimiento.safeParse(entrada);
@@ -67,6 +75,8 @@ export async function guardarEstablecimiento(
     });
     revalidatePath("/establecimientos");
     revalidatePath(`/establecimientos/${existente.id}`);
+    // Las solicitudes leen los datos vigentes del establecimiento.
+    revalidatePath("/solicitudes", "layout");
     return { ok: true, mensaje: "Cambios guardados." };
   }
 
@@ -91,6 +101,7 @@ export async function cambiarActivoEstablecimiento(id: string): Promise<EstadoFo
   const ctx = await obtenerContexto();
   const sinPermiso = sinPermisoEdicion(ctx);
   if (sinPermiso) return sinPermiso;
+  if (!esIdValido(id)) return { ok: false, mensaje: MENSAJE_NO_ENCONTRADO };
 
   const est = await db.establecimiento.findFirst({ where: { id, empresaId: ctx.empresa.id }, select: { id: true, activo: true } });
   if (!est) return { ok: false, mensaje: MENSAJE_NO_ENCONTRADO };
@@ -112,6 +123,7 @@ export async function eliminarEstablecimiento(id: string): Promise<EstadoFormula
   const ctx = await obtenerContexto();
   const sinPermiso = sinPermisoEdicion(ctx);
   if (sinPermiso) return sinPermiso;
+  if (!esIdValido(id)) return { ok: false, mensaje: MENSAJE_NO_ENCONTRADO };
 
   const est = await db.establecimiento.findFirst({
     where: { id, empresaId: ctx.empresa.id },
