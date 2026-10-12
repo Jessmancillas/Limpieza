@@ -1,0 +1,7 @@
+{
+  "catalogo": "CAT_FORMA_FARMACEUTICA",
+  "fuente": "SEMILLA",
+  "porConfirmar": true,
+  "nota": "idFormaFarmaceutica; el manual no trae ejemplo. Importar el catálogo oficial.",
+  "registros": []
+}

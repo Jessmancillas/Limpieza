@@ -1,0 +1,12 @@
+{
+  "catalogo": "CAT_CLASIF_PRODUCTO",
+  "fuente": "SEMILLA",
+  "porConfirmar": true,
+  "nota": "Claves internas de VUCEM (idClasificacionProducto); no son públicas. Importar el catálogo oficial.",
+  "registros": [
+    {
+      "clave": "52",
+      "descripcion": "Clave de ejemplo del manual (confirmar en catálogo VUCEM)"
+    }
+  ]
+}

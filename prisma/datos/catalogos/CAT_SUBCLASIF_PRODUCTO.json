@@ -1,0 +1,13 @@
+{
+  "catalogo": "CAT_SUBCLASIF_PRODUCTO",
+  "fuente": "SEMILLA",
+  "porConfirmar": true,
+  "nota": "Claves internas de VUCEM (idSubClasificacionProducto); padreClave = clave de CAT_CLASIF_PRODUCTO.",
+  "registros": [
+    {
+      "clave": "25",
+      "descripcion": "Clave de ejemplo del manual (confirmar en catálogo VUCEM)",
+      "padreClave": "52"
+    }
+  ]
+}

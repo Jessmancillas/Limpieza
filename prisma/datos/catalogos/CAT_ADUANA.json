@@ -1,0 +1,204 @@
+{
+  "catalogo": "CAT_ADUANA",
+  "fuente": "SEMILLA",
+  "porConfirmar": true,
+  "nota": "Apéndice 1 del Anexo 22 de las RGCE: clave de 3 dígitos = aduana (2) + sección (1). Solo secciones principales; confirmar contra el catálogo de VUCEM.",
+  "registros": [
+    {
+      "clave": "010",
+      "descripcion": "Acapulco, Gro."
+    },
+    {
+      "clave": "020",
+      "descripcion": "Agua Prieta, Son."
+    },
+    {
+      "clave": "050",
+      "descripcion": "Subteniente López, Q. Roo"
+    },
+    {
+      "clave": "060",
+      "descripcion": "Ciudad del Carmen, Camp."
+    },
+    {
+      "clave": "070",
+      "descripcion": "Ciudad Juárez, Chih."
+    },
+    {
+      "clave": "080",
+      "descripcion": "Coatzacoalcos, Ver."
+    },
+    {
+      "clave": "110",
+      "descripcion": "Ensenada, B.C."
+    },
+    {
+      "clave": "120",
+      "descripcion": "Guaymas, Son."
+    },
+    {
+      "clave": "140",
+      "descripcion": "La Paz, B.C.S."
+    },
+    {
+      "clave": "160",
+      "descripcion": "Manzanillo, Col."
+    },
+    {
+      "clave": "170",
+      "descripcion": "Matamoros, Tamps."
+    },
+    {
+      "clave": "180",
+      "descripcion": "Mazatlán, Sin."
+    },
+    {
+      "clave": "190",
+      "descripcion": "Mexicali, B.C."
+    },
+    {
+      "clave": "200",
+      "descripcion": "México, Cd. de Méx."
+    },
+    {
+      "clave": "220",
+      "descripcion": "Naco, Son."
+    },
+    {
+      "clave": "230",
+      "descripcion": "Nogales, Son."
+    },
+    {
+      "clave": "240",
+      "descripcion": "Nuevo Laredo, Tamps."
+    },
+    {
+      "clave": "250",
+      "descripcion": "Ojinaga, Chih."
+    },
+    {
+      "clave": "260",
+      "descripcion": "Puerto Palomas, Chih."
+    },
+    {
+      "clave": "270",
+      "descripcion": "Piedras Negras, Coah."
+    },
+    {
+      "clave": "280",
+      "descripcion": "Progreso, Yuc."
+    },
+    {
+      "clave": "300",
+      "descripcion": "Ciudad Reynosa, Tamps."
+    },
+    {
+      "clave": "310",
+      "descripcion": "Salina Cruz, Oax."
+    },
+    {
+      "clave": "330",
+      "descripcion": "San Luis Río Colorado, Son."
+    },
+    {
+      "clave": "340",
+      "descripcion": "Ciudad Miguel Alemán, Tamps."
+    },
+    {
+      "clave": "370",
+      "descripcion": "Ciudad Hidalgo, Chis."
+    },
+    {
+      "clave": "380",
+      "descripcion": "Tampico, Tamps."
+    },
+    {
+      "clave": "390",
+      "descripcion": "Tecate, B.C."
+    },
+    {
+      "clave": "400",
+      "descripcion": "Tijuana, B.C."
+    },
+    {
+      "clave": "420",
+      "descripcion": "Tuxpan, Ver."
+    },
+    {
+      "clave": "430",
+      "descripcion": "Veracruz, Ver."
+    },
+    {
+      "clave": "440",
+      "descripcion": "Ciudad Acuña, Coah."
+    },
+    {
+      "clave": "460",
+      "descripcion": "Torreón, Coah."
+    },
+    {
+      "clave": "470",
+      "descripcion": "Aeropuerto Internacional de la Ciudad de México"
+    },
+    {
+      "clave": "480",
+      "descripcion": "Guadalajara, Jal."
+    },
+    {
+      "clave": "500",
+      "descripcion": "Sonoyta, Son."
+    },
+    {
+      "clave": "510",
+      "descripcion": "Lázaro Cárdenas, Mich."
+    },
+    {
+      "clave": "520",
+      "descripcion": "Monterrey, N.L."
+    },
+    {
+      "clave": "530",
+      "descripcion": "Cancún, Q. Roo"
+    },
+    {
+      "clave": "640",
+      "descripcion": "Querétaro, Qro."
+    },
+    {
+      "clave": "650",
+      "descripcion": "Toluca, Méx."
+    },
+    {
+      "clave": "670",
+      "descripcion": "Chihuahua, Chih."
+    },
+    {
+      "clave": "730",
+      "descripcion": "Aguascalientes, Ags."
+    },
+    {
+      "clave": "750",
+      "descripcion": "Puebla, Pue."
+    },
+    {
+      "clave": "800",
+      "descripcion": "Colombia, N.L."
+    },
+    {
+      "clave": "810",
+      "descripcion": "Altamira, Tamps."
+    },
+    {
+      "clave": "820",
+      "descripcion": "Ciudad Camargo, Tamps."
+    },
+    {
+      "clave": "830",
+      "descripcion": "Dos Bocas, Tab."
+    },
+    {
+      "clave": "840",
+      "descripcion": "Guanajuato, Gto."
+    }
+  ]
+}

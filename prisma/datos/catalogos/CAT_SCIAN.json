@@ -1,0 +1,42 @@
+{
+  "catalogo": "CAT_SCIAN",
+  "fuente": "SEMILLA",
+  "porConfirmar": false,
+  "nota": "Selección de claves SCIAN 2018 (INEGI) relacionadas con dispositivos médicos. Importa el catálogo completo si necesitas otras.",
+  "registros": [
+    {
+      "clave": "325412",
+      "descripcion": "Fabricación de preparaciones farmacéuticas"
+    },
+    {
+      "clave": "339111",
+      "descripcion": "Fabricación de equipo no electrónico para uso médico, dental y para laboratorio"
+    },
+    {
+      "clave": "339112",
+      "descripcion": "Fabricación de material desechable de uso médico"
+    },
+    {
+      "clave": "339113",
+      "descripcion": "Fabricación de artículos oftálmicos"
+    },
+    {
+      "clave": "433110",
+      "descripcion": "Comercio al por mayor de productos farmacéuticos"
+    },
+    {
+      "clave": "435313",
+      "descripcion": "Comercio al por mayor de mobiliario, equipo e instrumental médico y de laboratorio"
+    },
+    {
+      "clave": "464121",
+      "descripcion": "Comercio al por menor de lentes",
+      "porConfirmar": true
+    },
+    {
+      "clave": "464122",
+      "descripcion": "Comercio al por menor de artículos ortopédicos",
+      "porConfirmar": true
+    }
+  ]
+}

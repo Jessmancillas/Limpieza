@@ -1,0 +1,92 @@
+{
+  "catalogo": "CAT_UNIDAD_MEDIDA",
+  "fuente": "SEMILLA",
+  "porConfirmar": true,
+  "nota": "Apéndice 7 del Anexo 22 de las RGCE (unidades de medida). VUCEM puede usar otro catálogo (CAT_UNIDAD_MEDIDA_TTRA); confirmar.",
+  "registros": [
+    {
+      "clave": "1",
+      "descripcion": "Kilo"
+    },
+    {
+      "clave": "2",
+      "descripcion": "Gramo"
+    },
+    {
+      "clave": "3",
+      "descripcion": "Metro lineal"
+    },
+    {
+      "clave": "4",
+      "descripcion": "Metro cuadrado"
+    },
+    {
+      "clave": "5",
+      "descripcion": "Metro cúbico"
+    },
+    {
+      "clave": "6",
+      "descripcion": "Pieza"
+    },
+    {
+      "clave": "7",
+      "descripcion": "Cabeza"
+    },
+    {
+      "clave": "8",
+      "descripcion": "Litro"
+    },
+    {
+      "clave": "9",
+      "descripcion": "Par"
+    },
+    {
+      "clave": "10",
+      "descripcion": "Kilowatt"
+    },
+    {
+      "clave": "11",
+      "descripcion": "Millar"
+    },
+    {
+      "clave": "12",
+      "descripcion": "Juego"
+    },
+    {
+      "clave": "13",
+      "descripcion": "Kilowatt/hora"
+    },
+    {
+      "clave": "14",
+      "descripcion": "Tonelada"
+    },
+    {
+      "clave": "15",
+      "descripcion": "Barril"
+    },
+    {
+      "clave": "16",
+      "descripcion": "Gramo neto"
+    },
+    {
+      "clave": "17",
+      "descripcion": "Decenas"
+    },
+    {
+      "clave": "18",
+      "descripcion": "Cientos"
+    },
+    {
+      "clave": "19",
+      "descripcion": "Docenas"
+    },
+    {
+      "clave": "20",
+      "descripcion": "Caja"
+    },
+    {
+      "clave": "21",
+      "descripcion": "Botella"
+    }
+  ]
+}

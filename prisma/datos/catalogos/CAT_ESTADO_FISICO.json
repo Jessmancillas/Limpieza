@@ -1,0 +1,12 @@
+{
+  "catalogo": "CAT_ESTADO_FISICO",
+  "fuente": "SEMILLA",
+  "porConfirmar": true,
+  "nota": "Claves internas de VUCEM (idEstadoFisico); no son públicas. Importar el catálogo oficial.",
+  "registros": [
+    {
+      "clave": "ESFIMG.S",
+      "descripcion": "Clave de ejemplo del manual (confirmar en catálogo VUCEM)"
+    }
+  ]
+}
