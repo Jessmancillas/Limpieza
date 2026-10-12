@@ -30,7 +30,6 @@ export const MAX_NOMBRE_DOCUMENTO_VUCEM = 100;
 export function normalizarNombreDocumentoVucem(nombre: string): string {
   const limpio = nombre
     .normalize("NFC")
-    // eslint-disable-next-line no-control-regex
     .replace(/[\u0000-\u001f\u007f|]/g, " ")
     .replace(/\s+/g, " ")
     .trim();

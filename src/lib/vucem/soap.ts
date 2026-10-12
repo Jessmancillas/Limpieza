@@ -18,7 +18,6 @@ export const NS_RESPUESTA = "http://www.ventanillaunica.gob.mx/common/ws/oxml/re
 export const PASSWORD_REDACTADO = "********";
 
 // Caracteres no permitidos en XML 1.0 (controles salvo tab, salto de línea y retorno de carro).
-// eslint-disable-next-line no-control-regex
 const CONTROLES_INVALIDOS = /[\u0000-\u0008\u000B\u000C\u000E-\u001F￾￿]/g;
 
 /** Escapa texto para contenido o atributos XML. */
