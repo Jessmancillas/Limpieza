@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import type { OpcionCatalogo } from "@/lib/catalogos";
 import { ESTADOS_CONVERSION, ESTADOS_EDOCUMENT, TIPOS_DOCUMENTO, type EstadoConversion, type EstadoEDocument } from "@/lib/constantes";
 import { MAX_NOMBRE_DOCUMENTO } from "@/lib/pdf/limites";
 import { normalizarNombreDocumento } from "@/lib/pdf/nombre-documento";
@@ -68,3 +69,12 @@ export function esEstadoConversion(v: string): v is EstadoConversion {
 export function esEstadoEDocument(v: string): v is EstadoEDocument {
   return (ESTADOS_EDOCUMENT as readonly string[]).includes(v);
 }
+
+/** Producto o establecimiento que se puede ligar al documento. */
+export type OpcionLiga = { id: string; etiqueta: string; activo: boolean };
+
+export type OpcionesDocumento = {
+  productos: OpcionLiga[];
+  establecimientos: OpcionLiga[];
+  tiposDocumentoVucem: OpcionCatalogo[];
+};

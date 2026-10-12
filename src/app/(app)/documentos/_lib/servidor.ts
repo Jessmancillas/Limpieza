@@ -1,14 +1,15 @@
 import "server-only";
 
-import { borrarArchivo, guardarArchivo, rutaEsDeEmpresa } from "@/lib/storage";
-import { obtenerOpcionesCatalogo, type OpcionCatalogo } from "@/lib/catalogos";
+import { obtenerOpcionesCatalogo } from "@/lib/catalogos";
 import { db } from "@/lib/db";
 import { convertirAVucem, detectarMime } from "@/lib/pdf/convertir-vucem";
 import { EXTENSION_POR_MIME, MAX_BYTES_SUBIDA, MAX_MB_SUBIDA, type MimeAceptado } from "@/lib/pdf/limites";
 import { nombreArchivoSeguro } from "@/lib/pdf/nombre-documento";
-import { DEFINICION_260211_INICIAL, leerDefinicion } from "@/lib/tramite/definicion";
 import { ESTADOS_NO_EDITABLES } from "@/lib/solicitudes/consultas";
+import { borrarArchivo, guardarArchivo, rutaEsDeEmpresa } from "@/lib/storage";
+import { DEFINICION_260211_INICIAL, leerDefinicion } from "@/lib/tramite/definicion";
 
+import type { OpcionesDocumento } from "./esquema";
 import type { ReporteConversion } from "./utilidades";
 
 /** Clave VUCEM del trámite cuyos límites de PDF se aplican a los anexos. */
@@ -174,14 +175,6 @@ export async function solicitudesPresentadasConDocumento(empresaId: string, docu
   });
   return usos.map((u) => u.solicitud).filter((s) => ESTADOS_NO_EDITABLES.has(s.estado));
 }
-
-export type OpcionLiga = { id: string; etiqueta: string; activo: boolean };
-
-export type OpcionesDocumento = {
-  productos: OpcionLiga[];
-  establecimientos: OpcionLiga[];
-  tiposDocumentoVucem: OpcionCatalogo[];
-};
 
 /** Productos y establecimientos activos de la empresa (más los ya ligados aunque estén inactivos). */
 export async function cargarOpcionesDocumento(
