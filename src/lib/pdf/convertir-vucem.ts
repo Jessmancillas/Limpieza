@@ -4,7 +4,7 @@ import { readdir, readFile, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import { PDFDocument } from "pdf-lib";
-import sharp from "sharp";
+import sharp, { type Metadata, type OutputInfo, type Sharp } from "sharp";
 
 import { sha1Hex } from "@/lib/crypto";
 
@@ -182,7 +182,7 @@ export function leerPgm(datos: Buffer): { ancho: number; alto: number; pixeles: 
   return { ancho, alto, pixeles };
 }
 
-function codificarJpeg(imagen: sharp.Sharp, calidad: number, dpi: number): Promise<Buffer> {
+function codificarJpeg(imagen: Sharp, calidad: number, dpi: number): Promise<Buffer> {
   return imagen
     .toColourspace("b-w")
     .withDensity(dpi)
@@ -344,7 +344,7 @@ async function rasterizarImagen(
   if (detectarMime(entrada) !== mime) {
     throw new ErrorConversion("El contenido del archivo no corresponde a su tipo (la extensión no coincide con el formato real).");
   }
-  let meta: sharp.Metadata;
+  let meta: Metadata;
   try {
     meta = await sharp(entrada, { limitInputPixels: MAX_PIXELES_PAGINA }).metadata();
   } catch {
@@ -360,7 +360,7 @@ async function rasterizarImagen(
   const bajaResolucion: string[] = [];
   for (let i = 0; i < total; i++) {
     verificarTiempo(limite);
-    let datos: { data: Buffer; info: sharp.OutputInfo };
+    let datos: { data: Buffer; info: OutputInfo };
     try {
       datos = await sharp(entrada, { page: i, limitInputPixels: MAX_PIXELES_PAGINA, autoOrient: true })
         .flatten({ background: "#ffffff" })

@@ -50,7 +50,8 @@ export type ArchivoSubido = { datos: Buffer; mime: MimeAceptado; nombre: string 
 /** Lee y valida el archivo del formulario. Regresa el archivo o un mensaje de error. */
 export async function leerArchivoSubido(formData: FormData, campo = "archivo"): Promise<ArchivoSubido | { error: string }> {
   const archivo = formData.get(campo);
-  if (!(archivo instanceof File) || archivo.size === 0) return { error: "Elige el archivo a subir (PDF, JPG o PNG)." };
+  // File extiende Blob; se acepta cualquier Blob por si el runtime usa otra implementación de File.
+  if (!(archivo instanceof Blob) || archivo.size === 0) return { error: "Elige el archivo a subir (PDF, JPG o PNG)." };
   if (archivo.size > MAX_BYTES_SUBIDA) return { error: `El archivo pesa más de ${MAX_MB_SUBIDA} MB. Divídelo o escanéalo de nuevo.` };
   const datos = Buffer.from(await archivo.arrayBuffer());
   // El tipo se decide por el contenido (primeros bytes), no por la extensión ni por lo que diga el navegador.
@@ -58,7 +59,8 @@ export async function leerArchivoSubido(formData: FormData, campo = "archivo"): 
   if (!mime) {
     return { error: "Tipo de archivo no soportado. Sube un PDF o una imagen JPG, PNG o TIFF (no Word, Excel ni ZIP)." };
   }
-  return { datos, mime, nombre: nombreArchivoSeguro(archivo.name || "documento", EXTENSION_POR_MIME[mime]).slice(0, 200) };
+  const nombreOriginal = "name" in archivo && typeof archivo.name === "string" && archivo.name ? archivo.name : "documento";
+  return { datos, mime, nombre: nombreArchivoSeguro(nombreOriginal, EXTENSION_POR_MIME[mime]).slice(0, 200) };
 }
 
 /** Campos de Documento que dependen del archivo convertido. */

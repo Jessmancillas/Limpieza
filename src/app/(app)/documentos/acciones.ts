@@ -173,7 +173,7 @@ const MENSAJE_PRESENTADO = (numeros: number[]) =>
   "ya presentada(s) ante VUCEM: su archivo no se puede cambiar. Sube un documento nuevo si necesitas otra versión.";
 
 /** Vuelve a convertir el archivo original con los límites vigentes del trámite. */
-export async function reconvertirDocumento(id: string, _previo: EstadoFormulario, _formData: FormData): Promise<EstadoFormulario> {
+export async function reconvertirDocumento(id: string): Promise<EstadoFormulario> {
   const ctx = await obtenerContexto();
   const sinPermiso = sinPermisoEdicion(ctx);
   if (sinPermiso) return sinPermiso;
@@ -298,7 +298,7 @@ export async function reemplazarArchivo(id: string, _previo: EstadoFormulario, f
 }
 
 /** Elimina el documento y sus archivos, solo si no está ligado a ninguna solicitud. */
-export async function eliminarDocumento(id: string, _previo: EstadoFormulario, _formData: FormData): Promise<EstadoFormulario> {
+export async function eliminarDocumento(id: string): Promise<EstadoFormulario> {
   const ctx = await obtenerContexto();
   const sinPermiso = sinPermisoEdicion(ctx);
   if (sinPermiso) return sinPermiso;

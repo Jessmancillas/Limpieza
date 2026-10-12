@@ -24,6 +24,14 @@ export function normalizarNombreDocumento(texto: string): string {
   return salida.replace(/\s+/g, " ").trim().slice(0, MAX_NOMBRE_DOCUMENTO).trim();
 }
 
+/** "foto.jpeg" ya tiene extensión de JPEG: no se le agrega ".jpg". */
+const EXTENSIONES_EQUIVALENTES: Record<string, string[]> = {
+  jpg: ["jpg", "jpeg"],
+  jpeg: ["jpg", "jpeg"],
+  tif: ["tif", "tiff"],
+  tiff: ["tif", "tiff"],
+};
+
 /**
  * Nombre seguro para descargar (sin rutas ni caracteres problemáticos). Conserva acentos;
  * el encabezado HTTP agrega además una versión ASCII.
@@ -40,8 +48,9 @@ export function nombreArchivoSeguro(nombre: string, extension?: string): string 
     .trim();
   const base = limpio || "documento";
   if (!extension) return base;
-  const ext = `.${extension.replace(/^\./, "").toLowerCase()}`;
-  return base.toLowerCase().endsWith(ext) ? base : `${base}${ext}`;
+  const ext = extension.replace(/^\./, "").toLowerCase();
+  const equivalentes = EXTENSIONES_EQUIVALENTES[ext] ?? [ext];
+  return equivalentes.some((e) => base.toLowerCase().endsWith(`.${e}`)) ? base : `${base}.${ext}`;
 }
 
 /** Content-Disposition: attachment con nombre ASCII de respaldo y filename* (RFC 5987/6266). */
