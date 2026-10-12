@@ -1,0 +1,536 @@
+// Esquema de datos de la app de Permisos Sanitarios de Importación (VUCEM 260211).
+//
+// Convenciones:
+// - SQLite en desarrollo; los "enums" se guardan como String y se validan en código
+//   (ver src/lib/constantes.ts) para que el esquema sea portable a PostgreSQL.
+// - Todo dato de negocio cuelga de una Empresa (multi-RFC). Las consultas SIEMPRE filtran
+//   por empresaId (ver src/lib/auth/contexto.ts).
+// - Los nombres de campo siguen el Manual WS 260211 (SAT-AGCTI v1.0) cuando aplica.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// ───────────────────────────── Usuarios y sesiones ─────────────────────────────
+
+model Usuario {
+  id            String      @id @default(cuid())
+  email         String      @unique
+  nombre        String
+  passwordHash  String
+  activo        Boolean     @default(true)
+  creadoEn      DateTime    @default(now())
+  actualizadoEn DateTime    @updatedAt
+  sesiones      Sesion[]
+  membresias    Membresia[]
+}
+
+model Sesion {
+  id              String   @id @default(cuid())
+  /// SHA-256 del token de la cookie (el token en claro nunca se guarda).
+  tokenHash       String   @unique
+  usuarioId       String
+  usuario         Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  empresaActivaId String?
+  expiraEn        DateTime
+  creadoEn        DateTime @default(now())
+
+  @@index([usuarioId])
+}
+
+/// Empresa importadora (solicitante ante VUCEM). Una agencia puede tener varias.
+model Empresa {
+  id                String    @id @default(cuid())
+  rfc               String    @unique
+  /// "MORAL" | "FISICA" (WS: tipoPersonaSolicitante 1 = moral, 0 = física)
+  tipoPersona       String    @default("MORAL")
+  razonSocial       String?
+  nombre            String?
+  apellidoPaterno   String?
+  apellidoMaterno   String?
+  curp              String?
+  actividadProductiva String?
+  correoElectronico String
+  telefono          String?
+  // Domicilio fiscal tal como está registrado en VUCEM (forma parte de la cadena original).
+  calle             String?
+  numeroExterior    String?
+  numeroInterior    String?
+  codigoPostal      String?
+  colonia           String?
+  localidad         String?
+  municipio         String?
+  entidadFederativa String?
+  pais              String    @default("MEX")
+  creadoEn          DateTime  @default(now())
+  actualizadoEn     DateTime  @updatedAt
+
+  membresias        Membresia[]
+  establecimientos  Establecimiento[]
+  terceros          Tercero[]
+  productos         Producto[]
+  documentos        Documento[]
+  solicitudes       Solicitud[]
+  credencialVucem   CredencialVucem?
+  configuracionVucem ConfiguracionVucem?
+  bitacora          Bitacora[]
+}
+
+model Membresia {
+  id        String   @id @default(cuid())
+  usuarioId String
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  empresaId String
+  empresa   Empresa  @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+  /// "ADMIN" | "CAPTURISTA" | "CONSULTA"
+  rol       String   @default("CAPTURISTA")
+  creadoEn  DateTime @default(now())
+
+  @@unique([usuarioId, empresaId])
+}
+
+// ───────────────────────────── VUCEM: credenciales y configuración ─────────────
+
+/// Contraseña de servicios web de VUCEM, cifrada con AES-256-GCM (APP_ENCRYPTION_KEY).
+/// La e.firma (.cer/.key) NUNCA se guarda: se usa solo en el navegador.
+model CredencialVucem {
+  id                String   @id @default(cuid())
+  empresaId         String   @unique
+  empresa           Empresa  @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+  /// Usuario del UsernameToken (normalmente el RFC del solicitante).
+  usuarioWs         String
+  passwordCifrado   String
+  actualizadoEn     DateTime @updatedAt
+  actualizadoPorId  String?
+}
+
+model ConfiguracionVucem {
+  id                     String   @id @default(cuid())
+  empresaId              String   @unique
+  empresa                Empresa  @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+  /// "SIMULADOR" | "PRUEBAS" | "PRODUCCION"
+  ambiente               String   @default("SIMULADOR")
+  /// Endpoint SOAP del WS 260211 (no publicado en el manual; se obtiene del WSDL).
+  urlSolicitud           String?
+  /// Nombre del elemento de operación dentro del Body (manual: "nombreDelServicio").
+  operacionSolicitud     String?
+  /// Namespace del prefijo ws: del manual.
+  namespaceSolicitud     String?
+  /// Valor de wsa:Action / SOAPAction.
+  soapActionSolicitud    String?
+  /// Endpoint del WS de Digitalización (eDocument).
+  urlDigitalizacion      String?
+  /// Correo que se envía en la digitalización y que forma parte de su cadena original.
+  correoDigitalizacion   String?
+  actualizadoEn          DateTime @updatedAt
+}
+
+// ───────────────────────────── Catálogos ─────────────────────────────
+
+/// Catálogos de VUCEM / SAT (globales). catalogo = CAT_ADUANA, CAT_REGIMEN, CAT_PAIS, ...
+model CatalogoVucem {
+  id          String  @id @default(cuid())
+  catalogo    String
+  clave       String
+  descripcion String
+  /// Para catálogos jerárquicos (p. ej. subclasificación → clasificación).
+  padreClave  String?
+  /// "SEMILLA" | "IMPORTADO" | "MANUAL"
+  fuente      String  @default("SEMILLA")
+  /// true cuando la clave no se ha verificado contra el catálogo oficial.
+  porConfirmar Boolean @default(false)
+  activo      Boolean @default(true)
+
+  @@unique([catalogo, clave])
+  @@index([catalogo])
+}
+
+model DiaInhabil {
+  id          String   @id @default(cuid())
+  fecha       DateTime @unique
+  descripcion String
+}
+
+/// Definición versionada del trámite (campos/requisitos/límites pueden cambiar por normativa).
+model TramiteVersion {
+  id            String      @id @default(cuid())
+  claveVucem    String      // "260211"
+  homoclave     String?     // p. ej. "COFEPRIS-01-014-A"
+  nombre        String
+  /// "VUCEM_CLASICA" | "VUCEM_3"
+  plataforma    String
+  vigenteDesde  DateTime
+  activo        Boolean     @default(true)
+  /// JSON: { requisitos: [{ tipo, nombre, obligatorio, maxMB, minDpi }], notas }
+  definicion    String
+  creadoEn      DateTime    @default(now())
+  solicitudes   Solicitud[]
+
+  @@unique([claveVucem, vigenteDesde])
+}
+
+// ───────────────────────────── Catálogos de la empresa ─────────────────────────
+
+model Establecimiento {
+  id                       String   @id @default(cuid())
+  empresaId                String
+  empresa                  Empresa  @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+  denominacionRazonSocial  String
+  rfcResponsableSanitario  String
+  correoElectronico        String
+  telefono                 String
+  calle                    String
+  numeroExterior           String?
+  codigoPostal             String
+  /// Clave/descripción de CAT_ENTIDAD
+  entidadFederativa        String
+  municipio                String
+  colonia                  String?
+  localidad                String?
+  noLicenciaSanitaria      String?
+  /// WS avisoFuncionamiento (0/1). Excluyente con licencia sanitaria en el portal.
+  tieneAvisoFuncionamiento Boolean  @default(false)
+  activo                   Boolean  @default(true)
+  creadoEn                 DateTime @default(now())
+  actualizadoEn            DateTime @updatedAt
+  scian                    EstablecimientoScian[]
+  solicitudes              Solicitud[]
+  documentos               Documento[]
+
+  @@index([empresaId])
+}
+
+model EstablecimientoScian {
+  id                String          @id @default(cuid())
+  establecimientoId String
+  establecimiento   Establecimiento @relation(fields: [establecimientoId], references: [id], onDelete: Cascade)
+  /// Clave SCIAN de 6 dígitos
+  clave             String
+  descripcion       String?
+
+  @@unique([establecimientoId, clave])
+}
+
+/// Terceros: fabricantes, proveedores, destinatarios y facturadores.
+model Tercero {
+  id                      String   @id @default(cuid())
+  empresaId               String
+  empresa                 Empresa  @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+  /// "FABRICANTE" | "PROVEEDOR" | "DESTINATARIO" | "FACTURADOR"
+  tipo                    String
+  /// "FISICA" | "MORAL"
+  tipoPersona             String
+  /// "NACIONAL" | "EXTRANJERO"
+  nacionalidad            String   @default("EXTRANJERO")
+  nombre                  String?
+  apellidoPaterno         String?
+  apellidoMaterno         String?
+  denominacionRazonSocial String?
+  rfc                     String?
+  curp                    String?
+  correoElectronico       String?
+  /// Clave de país de 3 letras (CAT_PAIS)
+  pais                    String
+  entidadFederativa       String?
+  municipio               String?
+  colonia                 String?
+  localidad               String?
+  codigoPostal            String?
+  calle                   String
+  numeroExterior          String?
+  numeroInterior          String?
+  lada                    String?
+  telefono                String?
+  activo                  Boolean  @default(true)
+  creadoEn                DateTime @default(now())
+  actualizadoEn           DateTime @updatedAt
+  productosFabricados     Producto[]
+  solicitudes             SolicitudTercero[]
+
+  @@index([empresaId, tipo])
+}
+
+/// Dispositivo médico (mercancía) reutilizable entre solicitudes.
+model Producto {
+  id                          String    @id @default(cuid())
+  empresaId                   String
+  empresa                     Empresa   @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+  denominacionEspecifica      String
+  /// Marca
+  denominacionDistintiva      String
+  denominacionComunCientifica String
+  idClasificacionProducto     String?
+  idSubClasificacionProducto  String?
+  idTipoProducto              String?
+  especifique                 String?
+  idFormaFarmaceutica         String?
+  idEstadoFisico              String?
+  /// Fracción arancelaria TIGIE de 8 dígitos
+  fraccionArancelaria         String
+  descripcionFraccion         String?
+  /// Clave de unidad de medida tarifaria
+  umt                         String?
+  /// Clave de unidad de medida comercial (CAT_UNIDAD_MEDIDA)
+  umc                         String?
+  /// Descripción de la UMC (WS desUMC)
+  desUMC                      String
+  presentacionTipoEnvase      String
+  numRegistroSanitario        String?
+  vigenciaRegistroSanitario   DateTime?
+  cvePaisOrigen               String?
+  idUsoEspecifico             String?
+  fabricanteId                String?
+  fabricante                  Tercero?  @relation(fields: [fabricanteId], references: [id], onDelete: SetNull)
+  notas                       String?
+  activo                      Boolean   @default(true)
+  creadoEn                    DateTime  @default(now())
+  actualizadoEn               DateTime  @updatedAt
+  partidas                    PartidaSolicitud[]
+  documentos                  Documento[]
+
+  @@index([empresaId])
+}
+
+// ───────────────────────────── Documentos ─────────────────────────────
+
+model Documento {
+  id                      String    @id @default(cuid())
+  empresaId               String
+  empresa                 Empresa   @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+  /// Tipo de requisito (ver TIPOS_DOCUMENTO en src/lib/constantes.ts)
+  tipo                    String
+  /// Nombre descriptivo (también es "nombreDocumento" en la digitalización VUCEM)
+  nombre                  String
+  /// idTipoDocumento del catálogo de digitalización VUCEM (CAT_TIPO_DOCUMENTO)
+  idTipoDocumentoVucem    String?
+  productoId              String?
+  producto                Producto?        @relation(fields: [productoId], references: [id], onDelete: SetNull)
+  establecimientoId       String?
+  establecimiento         Establecimiento? @relation(fields: [establecimientoId], references: [id], onDelete: SetNull)
+  vigenciaHasta           DateTime?
+  // Archivo original (ruta relativa dentro de STORAGE_DIR)
+  archivoOriginalRuta     String
+  archivoOriginalNombre   String
+  archivoOriginalBytes    Int
+  archivoOriginalMime     String
+  // Archivo convertido al formato VUCEM (PDF solo-imagen, escala de grises, >= 300 dpi)
+  archivoVucemRuta        String?
+  archivoVucemBytes       Int?
+  sha1Vucem               String?
+  paginas                 Int?
+  dpi                     Int?
+  /// "PENDIENTE" | "OK" | "ADVERTENCIA" | "ERROR"
+  estadoConversion        String    @default("PENDIENTE")
+  /// JSON con el reporte de conversión (páginas en blanco, tamaño, avisos)
+  reporteConversion       String?
+  // Digitalización VUCEM (eDocument)
+  /// "NO_ENVIADO" | "PENDIENTE" | "OK" | "ERROR"
+  estadoEDocument         String    @default("NO_ENVIADO")
+  numeroOperacionEDoc     String?
+  eDocument               String?
+  numeroTramiteEDoc       String?
+  errorEDocument          String?
+  eDocumentFecha          DateTime?
+  creadoEn                DateTime  @default(now())
+  creadoPorId             String?
+  actualizadoEn           DateTime  @updatedAt
+  solicitudes             SolicitudDocumento[]
+  envios                  EnvioVucem[]
+
+  @@index([empresaId, tipo])
+}
+
+// ───────────────────────────── Solicitudes ─────────────────────────────
+
+model Solicitud {
+  id                     String          @id @default(cuid())
+  /// Consecutivo legible para el usuario (por empresa)
+  numero                 Int
+  empresaId              String
+  empresa                Empresa         @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+  tramiteVersionId       String
+  tramiteVersion         TramiteVersion  @relation(fields: [tramiteVersionId], references: [id])
+  establecimientoId      String?
+  establecimiento        Establecimiento? @relation(fields: [establecimientoId], references: [id], onDelete: SetNull)
+  /// Ver ESTADOS_SOLICITUD en src/lib/constantes.ts
+  estado                 String          @default("BORRADOR")
+  cveRegimen             String?
+  cveAduana              String?
+  // Manifiestos y declaraciones
+  cveDeclaracion         Boolean         @default(false)
+  informacionConfidencial Boolean        @default(false)
+  // Representante legal
+  rlRfc                  String?
+  rlNombre               String?
+  rlApellidoPaterno      String?
+  rlApellidoMaterno      String?
+  // Pago de derechos (e5cinco)
+  pagoOmitido            Boolean         @default(false)
+  claveReferencia        String?
+  cadenaDependencia      String?
+  cveBanco               String?
+  llavePago              String?
+  fechaPago              DateTime?
+  /// Importe en pesos con 2 decimales, guardado como texto ("3117.00") para no perder precisión.
+  importePago            String?
+  // Presentación
+  /// "WS" | "PORTAL"
+  canalPresentacion      String?
+  numeroTemporal         String?
+  /// Folio oficial VUCEM de 25 dígitos
+  folioVucem             String?
+  fechaPresentacion      DateTime?
+  acuseRuta              String?
+  notas                  String?
+  creadoPorId            String?
+  creadoEn               DateTime        @default(now())
+  actualizadoEn          DateTime        @updatedAt
+  partidas               PartidaSolicitud[]
+  terceros               SolicitudTercero[]
+  documentos             SolicitudDocumento[]
+  requerimientos         Requerimiento[]
+  resolucion             Resolucion?
+  envios                 EnvioVucem[]
+
+  @@unique([empresaId, numero])
+  @@index([empresaId, estado])
+}
+
+/// Mercancía de la solicitud. Se copian los datos del producto (snapshot) para que
+/// editar el catálogo no altere solicitudes ya presentadas.
+model PartidaSolicitud {
+  id                          String    @id @default(cuid())
+  solicitudId                 String
+  solicitud                   Solicitud @relation(fields: [solicitudId], references: [id], onDelete: Cascade)
+  productoId                  String?
+  producto                    Producto? @relation(fields: [productoId], references: [id], onDelete: SetNull)
+  orden                       Int
+  idClasificacionProducto     String?
+  idSubClasificacionProducto  String?
+  denominacionEspecifica      String
+  denominacionDistintiva      String
+  denominacionComunCientifica String
+  idTipoProducto              String?
+  especifique                 String?
+  idFormaFarmaceutica         String?
+  idEstadoFisico              String?
+  fraccionArancelaria         String
+  descripcionFraccion         String?
+  /// Cantidades con hasta 3 decimales guardadas como texto
+  cantidadUMT                 String
+  cantidadUMC                 String
+  umt                         String?
+  umc                         String?
+  desUMC                      String
+  presentacionTipoEnvase      String
+  numRegistroSanitario        String?
+  /// dd/mm/aa según el manual; se guarda como fecha
+  fechaCaducidad              DateTime?
+  cvePaisOrigen               String
+  cvePaisProcedencia          String
+  idUsoEspecifico             String?
+  /// Resultado en la resolución: "ACEPTADA" | "RECHAZADA"
+  resultado                   String?
+
+  @@index([solicitudId])
+}
+
+model SolicitudTercero {
+  id          String    @id @default(cuid())
+  solicitudId String
+  solicitud   Solicitud @relation(fields: [solicitudId], references: [id], onDelete: Cascade)
+  terceroId   String
+  tercero     Tercero   @relation(fields: [terceroId], references: [id], onDelete: Restrict)
+  /// Rol en esta solicitud: "FABRICANTE" | "PROVEEDOR" | "DESTINATARIO" | "FACTURADOR"
+  rol         String
+
+  @@unique([solicitudId, terceroId, rol])
+}
+
+model SolicitudDocumento {
+  id          String    @id @default(cuid())
+  solicitudId String
+  solicitud   Solicitud @relation(fields: [solicitudId], references: [id], onDelete: Cascade)
+  documentoId String
+  documento   Documento @relation(fields: [documentoId], references: [id], onDelete: Restrict)
+  /// Tipo de requisito que cubre este documento
+  requisito   String
+
+  @@unique([solicitudId, documentoId])
+}
+
+model Requerimiento {
+  id                String    @id @default(cuid())
+  solicitudId       String
+  solicitud         Solicitud @relation(fields: [solicitudId], references: [id], onDelete: Cascade)
+  fechaNotificacion DateTime
+  plazoDiasHabiles  Int
+  fechaLimite       DateTime
+  descripcion       String
+  /// "PENDIENTE" | "ATENDIDO"
+  estado            String    @default("PENDIENTE")
+  fechaAtencion     DateTime?
+  notas             String?
+  creadoEn          DateTime  @default(now())
+}
+
+model Resolucion {
+  id              String    @id @default(cuid())
+  solicitudId     String    @unique
+  solicitud       Solicitud @relation(fields: [solicitudId], references: [id], onDelete: Cascade)
+  /// "ACEPTADA" | "RECHAZADA" | "PARCIAL"
+  sentido         String
+  numeroPermiso   String?
+  fechaResolucion DateTime
+  vigenciaHasta   DateTime?
+  restricciones   String?
+  observaciones   String?
+  documentoRuta   String?
+  creadoEn        DateTime  @default(now())
+}
+
+/// Bitácora de cada intercambio con VUCEM (XML sin contraseñas).
+model EnvioVucem {
+  id           String     @id @default(cuid())
+  empresaId    String
+  solicitudId  String?
+  solicitud    Solicitud? @relation(fields: [solicitudId], references: [id], onDelete: SetNull)
+  documentoId  String?
+  documento    Documento? @relation(fields: [documentoId], references: [id], onDelete: SetNull)
+  /// "SOLICITUD_260211" | "DIGITALIZACION_REGISTRO" | "DIGITALIZACION_CONSULTA"
+  tipo         String
+  ambiente     String
+  url          String
+  cadenaOriginal String?
+  requestXml   String
+  responseXml  String?
+  httpStatus   Int?
+  exito        Boolean    @default(false)
+  mensaje      String?
+  /// Folio / numeroOperacion / eDocument devuelto
+  resultado    String?
+  creadoEn     DateTime   @default(now())
+  creadoPorId  String?
+
+  @@index([empresaId, creadoEn])
+}
+
+model Bitacora {
+  id        String   @id @default(cuid())
+  empresaId String?
+  empresa   Empresa? @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+  usuarioId String?
+  accion    String
+  entidad   String
+  entidadId String?
+  /// JSON con detalles (nunca contraseñas ni llaves)
+  detalle   String?
+  creadoEn  DateTime @default(now())
+
+  @@index([empresaId, creadoEn])
+}
