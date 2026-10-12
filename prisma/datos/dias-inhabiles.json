@@ -1,1 +1,20 @@
-[]
+[
+  { "fecha": "2026-01-01", "descripcion": "Año Nuevo (1 de enero)" },
+  { "fecha": "2026-02-02", "descripcion": "Día de la Constitución (primer lunes de febrero)" },
+  { "fecha": "2026-03-16", "descripcion": "Natalicio de Benito Juárez (tercer lunes de marzo)" },
+  { "fecha": "2026-04-02", "descripcion": "Jueves Santo" },
+  { "fecha": "2026-04-03", "descripcion": "Viernes Santo" },
+  { "fecha": "2026-05-01", "descripcion": "Día del Trabajo (1 de mayo)" },
+  { "fecha": "2026-09-16", "descripcion": "Día de la Independencia (16 de septiembre)" },
+  { "fecha": "2026-11-16", "descripcion": "Revolución Mexicana (tercer lunes de noviembre)" },
+  { "fecha": "2026-12-25", "descripcion": "Navidad (25 de diciembre)" },
+  { "fecha": "2027-01-01", "descripcion": "Año Nuevo (1 de enero)" },
+  { "fecha": "2027-02-01", "descripcion": "Día de la Constitución (primer lunes de febrero)" },
+  { "fecha": "2027-03-15", "descripcion": "Natalicio de Benito Juárez (tercer lunes de marzo)" },
+  { "fecha": "2027-03-25", "descripcion": "Jueves Santo" },
+  { "fecha": "2027-03-26", "descripcion": "Viernes Santo" },
+  { "fecha": "2027-05-01", "descripcion": "Día del Trabajo (1 de mayo)" },
+  { "fecha": "2027-09-16", "descripcion": "Día de la Independencia (16 de septiembre)" },
+  { "fecha": "2027-11-15", "descripcion": "Revolución Mexicana (tercer lunes de noviembre)" },
+  { "fecha": "2027-12-25", "descripcion": "Navidad (25 de diciembre)" }
+]
