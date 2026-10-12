@@ -47,7 +47,8 @@ export function AccionesDocumento({
         <form
           action={reconvertir}
           onSubmit={(e) => {
-            if (tieneEDocument && !window.confirm(`¿Volver a convertir «${nombre}»? Si el PDF cambia,${avisoEDoc.toLowerCase()}`)) {
+            const pregunta = `¿Volver a convertir «${nombre}»? Si el PDF cambia, el eDocument actual se descartará y habrá que volver a digitalizarlo.`;
+            if (tieneEDocument && !window.confirm(pregunta)) {
               e.preventDefault();
             }
           }}
