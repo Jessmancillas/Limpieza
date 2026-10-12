@@ -1,0 +1,7 @@
+{
+  "catalogo": "CAT_TIPO_DOCUMENTO",
+  "fuente": "SEMILLA",
+  "porConfirmar": true,
+  "nota": "idTipoDocumento del servicio de digitalización de VUCEM; importar el catálogo oficial.",
+  "registros": []
+}

@@ -1,0 +1,12 @@
+{
+  "catalogo": "CAT_REGIMEN",
+  "fuente": "SEMILLA",
+  "porConfirmar": true,
+  "nota": "Solo el valor de ejemplo del manual.",
+  "registros": [
+    {
+      "clave": "01",
+      "descripcion": "Clave de ejemplo del manual (confirmar en catálogo VUCEM)"
+    }
+  ]
+}

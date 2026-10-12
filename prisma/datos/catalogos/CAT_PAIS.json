@@ -1,0 +1,1004 @@
+{
+  "catalogo": "CAT_PAIS",
+  "fuente": "SEMILLA",
+  "porConfirmar": false,
+  "nota": "ISO 3166-1 alfa-3 con nombres en español (CLDR es-MX). El WS 260211 usa claves de 3 letras (MEX, USA, AUS…).",
+  "registros": [
+    {
+      "clave": "ABW",
+      "descripcion": "Aruba"
+    },
+    {
+      "clave": "AFG",
+      "descripcion": "Afganistán"
+    },
+    {
+      "clave": "AGO",
+      "descripcion": "Angola"
+    },
+    {
+      "clave": "AIA",
+      "descripcion": "Anguila"
+    },
+    {
+      "clave": "ALA",
+      "descripcion": "Islas Åland"
+    },
+    {
+      "clave": "ALB",
+      "descripcion": "Albania"
+    },
+    {
+      "clave": "AND",
+      "descripcion": "Andorra"
+    },
+    {
+      "clave": "ARE",
+      "descripcion": "Emiratos Árabes Unidos"
+    },
+    {
+      "clave": "ARG",
+      "descripcion": "Argentina"
+    },
+    {
+      "clave": "ARM",
+      "descripcion": "Armenia"
+    },
+    {
+      "clave": "ASM",
+      "descripcion": "Samoa Americana"
+    },
+    {
+      "clave": "ATA",
+      "descripcion": "Antártida"
+    },
+    {
+      "clave": "ATF",
+      "descripcion": "Territorios Australes Franceses"
+    },
+    {
+      "clave": "ATG",
+      "descripcion": "Antigua y Barbuda"
+    },
+    {
+      "clave": "AUS",
+      "descripcion": "Australia"
+    },
+    {
+      "clave": "AUT",
+      "descripcion": "Austria"
+    },
+    {
+      "clave": "AZE",
+      "descripcion": "Azerbaiyán"
+    },
+    {
+      "clave": "BDI",
+      "descripcion": "Burundi"
+    },
+    {
+      "clave": "BEL",
+      "descripcion": "Bélgica"
+    },
+    {
+      "clave": "BEN",
+      "descripcion": "Benín"
+    },
+    {
+      "clave": "BES",
+      "descripcion": "Caribe neerlandés"
+    },
+    {
+      "clave": "BFA",
+      "descripcion": "Burkina Faso"
+    },
+    {
+      "clave": "BGD",
+      "descripcion": "Bangladés"
+    },
+    {
+      "clave": "BGR",
+      "descripcion": "Bulgaria"
+    },
+    {
+      "clave": "BHR",
+      "descripcion": "Baréin"
+    },
+    {
+      "clave": "BHS",
+      "descripcion": "Bahamas"
+    },
+    {
+      "clave": "BIH",
+      "descripcion": "Bosnia y Herzegovina"
+    },
+    {
+      "clave": "BLM",
+      "descripcion": "San Bartolomé"
+    },
+    {
+      "clave": "BLR",
+      "descripcion": "Bielorrusia"
+    },
+    {
+      "clave": "BLZ",
+      "descripcion": "Belice"
+    },
+    {
+      "clave": "BMU",
+      "descripcion": "Bermudas"
+    },
+    {
+      "clave": "BOL",
+      "descripcion": "Bolivia"
+    },
+    {
+      "clave": "BRA",
+      "descripcion": "Brasil"
+    },
+    {
+      "clave": "BRB",
+      "descripcion": "Barbados"
+    },
+    {
+      "clave": "BRN",
+      "descripcion": "Brunéi"
+    },
+    {
+      "clave": "BTN",
+      "descripcion": "Bután"
+    },
+    {
+      "clave": "BVT",
+      "descripcion": "Isla Bouvet"
+    },
+    {
+      "clave": "BWA",
+      "descripcion": "Botsuana"
+    },
+    {
+      "clave": "CAF",
+      "descripcion": "República Centroafricana"
+    },
+    {
+      "clave": "CAN",
+      "descripcion": "Canadá"
+    },
+    {
+      "clave": "CCK",
+      "descripcion": "Islas Cocos"
+    },
+    {
+      "clave": "CHE",
+      "descripcion": "Suiza"
+    },
+    {
+      "clave": "CHL",
+      "descripcion": "Chile"
+    },
+    {
+      "clave": "CHN",
+      "descripcion": "China"
+    },
+    {
+      "clave": "CIV",
+      "descripcion": "Costa de Marfil"
+    },
+    {
+      "clave": "CMR",
+      "descripcion": "Camerún"
+    },
+    {
+      "clave": "COD",
+      "descripcion": "República Democrática del Congo"
+    },
+    {
+      "clave": "COG",
+      "descripcion": "República del Congo"
+    },
+    {
+      "clave": "COK",
+      "descripcion": "Islas Cook"
+    },
+    {
+      "clave": "COL",
+      "descripcion": "Colombia"
+    },
+    {
+      "clave": "COM",
+      "descripcion": "Comoras"
+    },
+    {
+      "clave": "CPV",
+      "descripcion": "Cabo Verde"
+    },
+    {
+      "clave": "CRI",
+      "descripcion": "Costa Rica"
+    },
+    {
+      "clave": "CUB",
+      "descripcion": "Cuba"
+    },
+    {
+      "clave": "CUW",
+      "descripcion": "Curazao"
+    },
+    {
+      "clave": "CXR",
+      "descripcion": "Isla de Navidad"
+    },
+    {
+      "clave": "CYM",
+      "descripcion": "Islas Caimán"
+    },
+    {
+      "clave": "CYP",
+      "descripcion": "Chipre"
+    },
+    {
+      "clave": "CZE",
+      "descripcion": "Chequia"
+    },
+    {
+      "clave": "DEU",
+      "descripcion": "Alemania"
+    },
+    {
+      "clave": "DJI",
+      "descripcion": "Yibuti"
+    },
+    {
+      "clave": "DMA",
+      "descripcion": "Dominica"
+    },
+    {
+      "clave": "DNK",
+      "descripcion": "Dinamarca"
+    },
+    {
+      "clave": "DOM",
+      "descripcion": "República Dominicana"
+    },
+    {
+      "clave": "DZA",
+      "descripcion": "Argelia"
+    },
+    {
+      "clave": "ECU",
+      "descripcion": "Ecuador"
+    },
+    {
+      "clave": "EGY",
+      "descripcion": "Egipto"
+    },
+    {
+      "clave": "ERI",
+      "descripcion": "Eritrea"
+    },
+    {
+      "clave": "ESH",
+      "descripcion": "Sáhara Occidental"
+    },
+    {
+      "clave": "ESP",
+      "descripcion": "España"
+    },
+    {
+      "clave": "EST",
+      "descripcion": "Estonia"
+    },
+    {
+      "clave": "ETH",
+      "descripcion": "Etiopía"
+    },
+    {
+      "clave": "FIN",
+      "descripcion": "Finlandia"
+    },
+    {
+      "clave": "FJI",
+      "descripcion": "Fiyi"
+    },
+    {
+      "clave": "FLK",
+      "descripcion": "Islas Malvinas"
+    },
+    {
+      "clave": "FRA",
+      "descripcion": "Francia"
+    },
+    {
+      "clave": "FRO",
+      "descripcion": "Islas Feroe"
+    },
+    {
+      "clave": "FSM",
+      "descripcion": "Micronesia"
+    },
+    {
+      "clave": "GAB",
+      "descripcion": "Gabón"
+    },
+    {
+      "clave": "GBR",
+      "descripcion": "Reino Unido"
+    },
+    {
+      "clave": "GEO",
+      "descripcion": "Georgia"
+    },
+    {
+      "clave": "GGY",
+      "descripcion": "Guernsey"
+    },
+    {
+      "clave": "GHA",
+      "descripcion": "Ghana"
+    },
+    {
+      "clave": "GIB",
+      "descripcion": "Gibraltar"
+    },
+    {
+      "clave": "GIN",
+      "descripcion": "Guinea"
+    },
+    {
+      "clave": "GLP",
+      "descripcion": "Guadalupe"
+    },
+    {
+      "clave": "GMB",
+      "descripcion": "Gambia"
+    },
+    {
+      "clave": "GNB",
+      "descripcion": "Guinea-Bisáu"
+    },
+    {
+      "clave": "GNQ",
+      "descripcion": "Guinea Ecuatorial"
+    },
+    {
+      "clave": "GRC",
+      "descripcion": "Grecia"
+    },
+    {
+      "clave": "GRD",
+      "descripcion": "Granada"
+    },
+    {
+      "clave": "GRL",
+      "descripcion": "Groenlandia"
+    },
+    {
+      "clave": "GTM",
+      "descripcion": "Guatemala"
+    },
+    {
+      "clave": "GUF",
+      "descripcion": "Guayana Francesa"
+    },
+    {
+      "clave": "GUM",
+      "descripcion": "Guam"
+    },
+    {
+      "clave": "GUY",
+      "descripcion": "Guyana"
+    },
+    {
+      "clave": "HKG",
+      "descripcion": "Hong Kong"
+    },
+    {
+      "clave": "HMD",
+      "descripcion": "Islas Heard y McDonald"
+    },
+    {
+      "clave": "HND",
+      "descripcion": "Honduras"
+    },
+    {
+      "clave": "HRV",
+      "descripcion": "Croacia"
+    },
+    {
+      "clave": "HTI",
+      "descripcion": "Haití"
+    },
+    {
+      "clave": "HUN",
+      "descripcion": "Hungría"
+    },
+    {
+      "clave": "IDN",
+      "descripcion": "Indonesia"
+    },
+    {
+      "clave": "IMN",
+      "descripcion": "Isla de Man"
+    },
+    {
+      "clave": "IND",
+      "descripcion": "India"
+    },
+    {
+      "clave": "IOT",
+      "descripcion": "Territorio Británico del Océano Índico"
+    },
+    {
+      "clave": "IRL",
+      "descripcion": "Irlanda"
+    },
+    {
+      "clave": "IRN",
+      "descripcion": "Irán"
+    },
+    {
+      "clave": "IRQ",
+      "descripcion": "Irak"
+    },
+    {
+      "clave": "ISL",
+      "descripcion": "Islandia"
+    },
+    {
+      "clave": "ISR",
+      "descripcion": "Israel"
+    },
+    {
+      "clave": "ITA",
+      "descripcion": "Italia"
+    },
+    {
+      "clave": "JAM",
+      "descripcion": "Jamaica"
+    },
+    {
+      "clave": "JEY",
+      "descripcion": "Jersey"
+    },
+    {
+      "clave": "JOR",
+      "descripcion": "Jordania"
+    },
+    {
+      "clave": "JPN",
+      "descripcion": "Japón"
+    },
+    {
+      "clave": "KAZ",
+      "descripcion": "Kazajistán"
+    },
+    {
+      "clave": "KEN",
+      "descripcion": "Kenia"
+    },
+    {
+      "clave": "KGZ",
+      "descripcion": "Kirguistán"
+    },
+    {
+      "clave": "KHM",
+      "descripcion": "Camboya"
+    },
+    {
+      "clave": "KIR",
+      "descripcion": "Kiribati"
+    },
+    {
+      "clave": "KNA",
+      "descripcion": "San Cristóbal y Nieves"
+    },
+    {
+      "clave": "KOR",
+      "descripcion": "Corea del Sur"
+    },
+    {
+      "clave": "KWT",
+      "descripcion": "Kuwait"
+    },
+    {
+      "clave": "LAO",
+      "descripcion": "Laos"
+    },
+    {
+      "clave": "LBN",
+      "descripcion": "Líbano"
+    },
+    {
+      "clave": "LBR",
+      "descripcion": "Liberia"
+    },
+    {
+      "clave": "LBY",
+      "descripcion": "Libia"
+    },
+    {
+      "clave": "LCA",
+      "descripcion": "Santa Lucía"
+    },
+    {
+      "clave": "LIE",
+      "descripcion": "Liechtenstein"
+    },
+    {
+      "clave": "LKA",
+      "descripcion": "Sri Lanka"
+    },
+    {
+      "clave": "LSO",
+      "descripcion": "Lesoto"
+    },
+    {
+      "clave": "LTU",
+      "descripcion": "Lituania"
+    },
+    {
+      "clave": "LUX",
+      "descripcion": "Luxemburgo"
+    },
+    {
+      "clave": "LVA",
+      "descripcion": "Letonia"
+    },
+    {
+      "clave": "MAC",
+      "descripcion": "Macao"
+    },
+    {
+      "clave": "MAF",
+      "descripcion": "San Martín"
+    },
+    {
+      "clave": "MAR",
+      "descripcion": "Marruecos"
+    },
+    {
+      "clave": "MCO",
+      "descripcion": "Mónaco"
+    },
+    {
+      "clave": "MDA",
+      "descripcion": "Moldavia"
+    },
+    {
+      "clave": "MDG",
+      "descripcion": "Madagascar"
+    },
+    {
+      "clave": "MDV",
+      "descripcion": "Maldivas"
+    },
+    {
+      "clave": "MEX",
+      "descripcion": "México"
+    },
+    {
+      "clave": "MHL",
+      "descripcion": "Islas Marshall"
+    },
+    {
+      "clave": "MKD",
+      "descripcion": "Macedonia del Norte"
+    },
+    {
+      "clave": "MLI",
+      "descripcion": "Mali"
+    },
+    {
+      "clave": "MLT",
+      "descripcion": "Malta"
+    },
+    {
+      "clave": "MMR",
+      "descripcion": "Myanmar"
+    },
+    {
+      "clave": "MNE",
+      "descripcion": "Montenegro"
+    },
+    {
+      "clave": "MNG",
+      "descripcion": "Mongolia"
+    },
+    {
+      "clave": "MNP",
+      "descripcion": "Islas Marianas del Norte"
+    },
+    {
+      "clave": "MOZ",
+      "descripcion": "Mozambique"
+    },
+    {
+      "clave": "MRT",
+      "descripcion": "Mauritania"
+    },
+    {
+      "clave": "MSR",
+      "descripcion": "Montserrat"
+    },
+    {
+      "clave": "MTQ",
+      "descripcion": "Martinica"
+    },
+    {
+      "clave": "MUS",
+      "descripcion": "Mauricio"
+    },
+    {
+      "clave": "MWI",
+      "descripcion": "Malaui"
+    },
+    {
+      "clave": "MYS",
+      "descripcion": "Malasia"
+    },
+    {
+      "clave": "MYT",
+      "descripcion": "Mayotte"
+    },
+    {
+      "clave": "NAM",
+      "descripcion": "Namibia"
+    },
+    {
+      "clave": "NCL",
+      "descripcion": "Nueva Caledonia"
+    },
+    {
+      "clave": "NER",
+      "descripcion": "Níger"
+    },
+    {
+      "clave": "NFK",
+      "descripcion": "Isla Norfolk"
+    },
+    {
+      "clave": "NGA",
+      "descripcion": "Nigeria"
+    },
+    {
+      "clave": "NIC",
+      "descripcion": "Nicaragua"
+    },
+    {
+      "clave": "NIU",
+      "descripcion": "Niue"
+    },
+    {
+      "clave": "NLD",
+      "descripcion": "Países Bajos"
+    },
+    {
+      "clave": "NOR",
+      "descripcion": "Noruega"
+    },
+    {
+      "clave": "NPL",
+      "descripcion": "Nepal"
+    },
+    {
+      "clave": "NRU",
+      "descripcion": "Nauru"
+    },
+    {
+      "clave": "NZL",
+      "descripcion": "Nueva Zelanda"
+    },
+    {
+      "clave": "OMN",
+      "descripcion": "Omán"
+    },
+    {
+      "clave": "PAK",
+      "descripcion": "Pakistán"
+    },
+    {
+      "clave": "PAN",
+      "descripcion": "Panamá"
+    },
+    {
+      "clave": "PCN",
+      "descripcion": "Islas Pitcairn"
+    },
+    {
+      "clave": "PER",
+      "descripcion": "Perú"
+    },
+    {
+      "clave": "PHL",
+      "descripcion": "Filipinas"
+    },
+    {
+      "clave": "PLW",
+      "descripcion": "Palaos"
+    },
+    {
+      "clave": "PNG",
+      "descripcion": "Papúa Nueva Guinea"
+    },
+    {
+      "clave": "POL",
+      "descripcion": "Polonia"
+    },
+    {
+      "clave": "PRI",
+      "descripcion": "Puerto Rico"
+    },
+    {
+      "clave": "PRK",
+      "descripcion": "Corea del Norte"
+    },
+    {
+      "clave": "PRT",
+      "descripcion": "Portugal"
+    },
+    {
+      "clave": "PRY",
+      "descripcion": "Paraguay"
+    },
+    {
+      "clave": "PSE",
+      "descripcion": "Palestina"
+    },
+    {
+      "clave": "PYF",
+      "descripcion": "Polinesia Francesa"
+    },
+    {
+      "clave": "QAT",
+      "descripcion": "Catar"
+    },
+    {
+      "clave": "REU",
+      "descripcion": "Reunión"
+    },
+    {
+      "clave": "ROU",
+      "descripcion": "Rumania"
+    },
+    {
+      "clave": "RUS",
+      "descripcion": "Rusia"
+    },
+    {
+      "clave": "RWA",
+      "descripcion": "Ruanda"
+    },
+    {
+      "clave": "SAU",
+      "descripcion": "Arabia Saudita"
+    },
+    {
+      "clave": "SDN",
+      "descripcion": "Sudán"
+    },
+    {
+      "clave": "SEN",
+      "descripcion": "Senegal"
+    },
+    {
+      "clave": "SGP",
+      "descripcion": "Singapur"
+    },
+    {
+      "clave": "SGS",
+      "descripcion": "Islas Georgia del Sur y Sándwich del Sur"
+    },
+    {
+      "clave": "SHN",
+      "descripcion": "Santa Elena"
+    },
+    {
+      "clave": "SJM",
+      "descripcion": "Svalbard y Jan Mayen"
+    },
+    {
+      "clave": "SLB",
+      "descripcion": "Islas Salomón"
+    },
+    {
+      "clave": "SLE",
+      "descripcion": "Sierra Leona"
+    },
+    {
+      "clave": "SLV",
+      "descripcion": "El Salvador"
+    },
+    {
+      "clave": "SMR",
+      "descripcion": "San Marino"
+    },
+    {
+      "clave": "SOM",
+      "descripcion": "Somalia"
+    },
+    {
+      "clave": "SPM",
+      "descripcion": "San Pedro y Miquelón"
+    },
+    {
+      "clave": "SRB",
+      "descripcion": "Serbia"
+    },
+    {
+      "clave": "SSD",
+      "descripcion": "Sudán del Sur"
+    },
+    {
+      "clave": "STP",
+      "descripcion": "Santo Tomé y Príncipe"
+    },
+    {
+      "clave": "SUR",
+      "descripcion": "Surinam"
+    },
+    {
+      "clave": "SVK",
+      "descripcion": "Eslovaquia"
+    },
+    {
+      "clave": "SVN",
+      "descripcion": "Eslovenia"
+    },
+    {
+      "clave": "SWE",
+      "descripcion": "Suecia"
+    },
+    {
+      "clave": "SWZ",
+      "descripcion": "Eswatini"
+    },
+    {
+      "clave": "SXM",
+      "descripcion": "Sint Maarten"
+    },
+    {
+      "clave": "SYC",
+      "descripcion": "Seychelles"
+    },
+    {
+      "clave": "SYR",
+      "descripcion": "Siria"
+    },
+    {
+      "clave": "TCA",
+      "descripcion": "Islas Turcas y Caicos"
+    },
+    {
+      "clave": "TCD",
+      "descripcion": "Chad"
+    },
+    {
+      "clave": "TGO",
+      "descripcion": "Togo"
+    },
+    {
+      "clave": "THA",
+      "descripcion": "Tailandia"
+    },
+    {
+      "clave": "TJK",
+      "descripcion": "Tayikistán"
+    },
+    {
+      "clave": "TKL",
+      "descripcion": "Tokelau"
+    },
+    {
+      "clave": "TKM",
+      "descripcion": "Turkmenistán"
+    },
+    {
+      "clave": "TLS",
+      "descripcion": "Timor Oriental"
+    },
+    {
+      "clave": "TON",
+      "descripcion": "Tonga"
+    },
+    {
+      "clave": "TTO",
+      "descripcion": "Trinidad y Tobago"
+    },
+    {
+      "clave": "TUN",
+      "descripcion": "Túnez"
+    },
+    {
+      "clave": "TUR",
+      "descripcion": "Turquía"
+    },
+    {
+      "clave": "TUV",
+      "descripcion": "Tuvalu"
+    },
+    {
+      "clave": "TWN",
+      "descripcion": "Taiwán"
+    },
+    {
+      "clave": "TZA",
+      "descripcion": "Tanzania"
+    },
+    {
+      "clave": "UGA",
+      "descripcion": "Uganda"
+    },
+    {
+      "clave": "UKR",
+      "descripcion": "Ucrania"
+    },
+    {
+      "clave": "UMI",
+      "descripcion": "Islas menores alejadas de EE. UU."
+    },
+    {
+      "clave": "URY",
+      "descripcion": "Uruguay"
+    },
+    {
+      "clave": "USA",
+      "descripcion": "Estados Unidos"
+    },
+    {
+      "clave": "UZB",
+      "descripcion": "Uzbekistán"
+    },
+    {
+      "clave": "VAT",
+      "descripcion": "Ciudad del Vaticano"
+    },
+    {
+      "clave": "VCT",
+      "descripcion": "San Vicente y las Granadinas"
+    },
+    {
+      "clave": "VEN",
+      "descripcion": "Venezuela"
+    },
+    {
+      "clave": "VGB",
+      "descripcion": "Islas Vírgenes Británicas"
+    },
+    {
+      "clave": "VIR",
+      "descripcion": "Islas Vírgenes de EE. UU."
+    },
+    {
+      "clave": "VNM",
+      "descripcion": "Vietnam"
+    },
+    {
+      "clave": "VUT",
+      "descripcion": "Vanuatu"
+    },
+    {
+      "clave": "WLF",
+      "descripcion": "Wallis y Futuna"
+    },
+    {
+      "clave": "WSM",
+      "descripcion": "Samoa"
+    },
+    {
+      "clave": "YEM",
+      "descripcion": "Yemen"
+    },
+    {
+      "clave": "ZAF",
+      "descripcion": "Sudáfrica"
+    },
+    {
+      "clave": "ZMB",
+      "descripcion": "Zambia"
+    },
+    {
+      "clave": "ZWE",
+      "descripcion": "Zimbabue"
+    }
+  ]
+}

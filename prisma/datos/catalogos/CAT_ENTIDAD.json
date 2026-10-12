@@ -1,0 +1,136 @@
+{
+  "catalogo": "CAT_ENTIDAD",
+  "fuente": "SEMILLA",
+  "porConfirmar": true,
+  "nota": "Clave = nombre en mayúsculas sin acentos, como aparece en el ejemplo del manual WS 260211. El manual también muestra claves cortas para terceros; confirmar contra el catálogo oficial de VUCEM.",
+  "registros": [
+    {
+      "clave": "AGUASCALIENTES",
+      "descripcion": "Aguascalientes"
+    },
+    {
+      "clave": "BAJA CALIFORNIA",
+      "descripcion": "Baja California"
+    },
+    {
+      "clave": "BAJA CALIFORNIA SUR",
+      "descripcion": "Baja California Sur"
+    },
+    {
+      "clave": "CAMPECHE",
+      "descripcion": "Campeche"
+    },
+    {
+      "clave": "CHIAPAS",
+      "descripcion": "Chiapas"
+    },
+    {
+      "clave": "CHIHUAHUA",
+      "descripcion": "Chihuahua"
+    },
+    {
+      "clave": "CIUDAD DE MEXICO",
+      "descripcion": "Ciudad de México"
+    },
+    {
+      "clave": "COAHUILA",
+      "descripcion": "Coahuila de Zaragoza"
+    },
+    {
+      "clave": "COLIMA",
+      "descripcion": "Colima"
+    },
+    {
+      "clave": "DURANGO",
+      "descripcion": "Durango"
+    },
+    {
+      "clave": "GUANAJUATO",
+      "descripcion": "Guanajuato"
+    },
+    {
+      "clave": "GUERRERO",
+      "descripcion": "Guerrero"
+    },
+    {
+      "clave": "HIDALGO",
+      "descripcion": "Hidalgo"
+    },
+    {
+      "clave": "JALISCO",
+      "descripcion": "Jalisco"
+    },
+    {
+      "clave": "MEXICO",
+      "descripcion": "México (Estado de México)"
+    },
+    {
+      "clave": "MICHOACAN",
+      "descripcion": "Michoacán de Ocampo"
+    },
+    {
+      "clave": "MORELOS",
+      "descripcion": "Morelos"
+    },
+    {
+      "clave": "NAYARIT",
+      "descripcion": "Nayarit"
+    },
+    {
+      "clave": "NUEVO LEON",
+      "descripcion": "Nuevo León"
+    },
+    {
+      "clave": "OAXACA",
+      "descripcion": "Oaxaca"
+    },
+    {
+      "clave": "PUEBLA",
+      "descripcion": "Puebla"
+    },
+    {
+      "clave": "QUERETARO",
+      "descripcion": "Querétaro"
+    },
+    {
+      "clave": "QUINTANA ROO",
+      "descripcion": "Quintana Roo"
+    },
+    {
+      "clave": "SAN LUIS POTOSI",
+      "descripcion": "San Luis Potosí"
+    },
+    {
+      "clave": "SINALOA",
+      "descripcion": "Sinaloa"
+    },
+    {
+      "clave": "SONORA",
+      "descripcion": "Sonora"
+    },
+    {
+      "clave": "TABASCO",
+      "descripcion": "Tabasco"
+    },
+    {
+      "clave": "TAMAULIPAS",
+      "descripcion": "Tamaulipas"
+    },
+    {
+      "clave": "TLAXCALA",
+      "descripcion": "Tlaxcala"
+    },
+    {
+      "clave": "VERACRUZ",
+      "descripcion": "Veracruz de Ignacio de la Llave"
+    },
+    {
+      "clave": "YUCATAN",
+      "descripcion": "Yucatán"
+    },
+    {
+      "clave": "ZACATECAS",
+      "descripcion": "Zacatecas"
+    }
+  ]
+}

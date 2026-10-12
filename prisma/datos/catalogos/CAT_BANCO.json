@@ -1,0 +1,12 @@
+{
+  "catalogo": "CAT_BANCO",
+  "fuente": "SEMILLA",
+  "porConfirmar": true,
+  "nota": "Clave del banco del pago de derechos (e5cinco); confirmar contra el catálogo de VUCEM.",
+  "registros": [
+    {
+      "clave": "15",
+      "descripcion": "Clave de ejemplo del manual (confirmar en catálogo VUCEM)"
+    }
+  ]
+}
