@@ -79,6 +79,22 @@ model Empresa {
   credencialVucem   CredencialVucem?
   configuracionVucem ConfiguracionVucem?
   bitacora          Bitacora[]
+
+  // ERP: arquitectura empresarial (compras, almacén, ventas, cobranza, finanzas, gobierno)
+  configuracionErp  ConfiguracionErp?
+  almacenes         Almacen[]
+  articulos         Articulo[]
+  proveedores       Proveedor[]
+  clientes          Cliente[]
+  ordenesCompra     OrdenCompra[]
+  recepciones       Recepcion[]
+  pedidosVenta      PedidoVenta[]
+  cuentasPorPagar   CuentaPorPagar[]
+  cuentasPorCobrar  CuentaPorCobrar[]
+  movimientosTesoreria MovimientoTesoreria[]
+  controlesGobierno ControlGobierno[]
+  riesgos           RiesgoSeguridad[]
+  tickets           TicketServicio[]
 }
 
 model Membresia {
@@ -89,6 +105,10 @@ model Membresia {
   empresa   Empresa  @relation(fields: [empresaId], references: [id], onDelete: Cascade)
   /// "ADMIN" | "CAPTURISTA" | "CONSULTA"
   rol       String   @default("CAPTURISTA")
+  /// Áreas funcionales del ERP separadas por coma (COMPRAS,ALMACEN,VENTAS,COBRANZA,FINANZAS,
+  /// APROBADOR,GOBIERNO). null = todas las áreas operativas (sin APROBADOR ni GOBIERNO).
+  /// Base de la segregación de funciones (ISO/IEC 27001 A.5.3, COBIT DSS06).
+  areas     String?
   creadoEn  DateTime @default(now())
 
   @@unique([usuarioId, empresaId])
@@ -533,4 +553,508 @@ model Bitacora {
   creadoEn  DateTime @default(now())
 
   @@index([empresaId, creadoEn])
+}
+
+// ═════════════════════════════ ERP · Arquitectura empresarial ═════════════════════════════
+//
+// Convenciones del ERP (ver docs/arquitectura-empresarial.md):
+// - Importes en CENTAVOS (Int) para no perder precisión; cantidades en Float redondeadas a 3
+//   decimales (src/lib/erp/dinero.ts).
+// - Tasas en puntos base (1600 = 16 %).
+// - Todo documento lleva consecutivo por empresa (numero) y quién lo creó/aprobó (trazabilidad,
+//   ISO/IEC 27001 A.8.15) y cada cambio queda en Bitacora.
+
+/// Políticas de decisión de la empresa (COBIT APO01/EDM03): umbrales de aprobación, tolerancias
+/// y parámetros de crédito y cobranza. Una por empresa; se crea con valores por defecto.
+model ConfiguracionErp {
+  id                         String   @id @default(cuid())
+  empresaId                  String   @unique
+  empresa                    Empresa  @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+  /// OC con total <= este importe (centavos) se aprueban automáticamente (nivel 0).
+  montoAutoAprobacion        Int      @default(500000)
+  /// OC con total <= este importe requieren 1 aprobador (APROBADOR o ADMIN).
+  montoAprobacionNivel1      Int      @default(5000000)
+  // Arriba de nivel 1 se requiere aprobación de un ADMIN (nivel 2, dirección).
+  /// Tolerancia de la conciliación a tres vías (OC-recepción-factura) en puntos base.
+  toleranciaPrecioBp         Int      @default(200)
+  toleranciaCantidadBp       Int      @default(0)
+  /// Crédito a clientes
+  diasGraciaCredito          Int      @default(15)
+  puntajeCreditoMinimo       Int      @default(60)
+  puntajeCreditoRevision     Int      @default(40)
+  /// Nivel de servicio objetivo para el stock de seguridad (factor z: 165 = 1.65 → 95 %).
+  factorServicioZ            Int      @default(165)
+  /// Separación estricta de funciones (si false, solo se advierte).
+  segregacionEstricta        Boolean  @default(true)
+  tasaIvaBp                  Int      @default(1600)
+  actualizadoEn              DateTime @updatedAt
+}
+
+model Almacen {
+  id           String   @id @default(cuid())
+  empresaId    String
+  empresa      Empresa  @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+  clave        String
+  nombre       String
+  ubicacion    String?
+  activo       Boolean  @default(true)
+  creadoEn     DateTime @default(now())
+  existencias  Existencia[]
+  movimientos  MovimientoInventario[]
+  ordenesCompra OrdenCompra[]
+  recepciones  Recepcion[]
+  pedidosVenta PedidoVenta[]
+
+  @@unique([empresaId, clave])
+}
+
+/// Artículo de inventario (SKU). Puede ligarse a un Producto del catálogo COFEPRIS.
+model Articulo {
+  id                   String   @id @default(cuid())
+  empresaId            String
+  empresa              Empresa  @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+  sku                  String
+  nombre               String
+  categoria            String?
+  unidad               String   @default("PZA")
+  /// Precio de venta de lista (centavos, sin IVA)
+  precioVenta          Int      @default(0)
+  /// Último costo de compra (centavos)
+  ultimoCosto          Int      @default(0)
+  tasaIvaBp            Int      @default(1600)
+  // Parámetros del modelo de inventario (EOQ / punto de reorden)
+  stockMinimo          Float    @default(0)
+  stockMaximo          Float    @default(0)
+  /// Demanda anual estimada (unidades). Si es 0 se estima con las salidas de los últimos 365 días.
+  demandaAnual         Float    @default(0)
+  /// Costo de ordenar por pedido (centavos)
+  costoOrdenar         Int      @default(50000)
+  /// Costo anual de mantener inventario como % del costo (puntos base, 2500 = 25 %)
+  costoMantenerBp      Int      @default(2500)
+  tiempoEntregaDias    Int      @default(7)
+  /// Desviación estándar de la demanda diaria (unidades) para el stock de seguridad.
+  desviacionDemandaDiaria Float @default(0)
+  proveedorPreferenteId String?
+  proveedorPreferente  Proveedor? @relation(fields: [proveedorPreferenteId], references: [id], onDelete: SetNull)
+  productoId           String?
+  activo               Boolean  @default(true)
+  creadoEn             DateTime @default(now())
+  actualizadoEn        DateTime @updatedAt
+  existencias          Existencia[]
+  movimientos          MovimientoInventario[]
+  partidasCompra       PartidaOrdenCompra[]
+  partidasVenta        PartidaVenta[]
+
+  @@unique([empresaId, sku])
+  @@index([empresaId])
+}
+
+/// Existencia por artículo y almacén con costo promedio ponderado.
+model Existencia {
+  id             String   @id @default(cuid())
+  articuloId     String
+  articulo       Articulo @relation(fields: [articuloId], references: [id], onDelete: Cascade)
+  almacenId      String
+  almacen        Almacen  @relation(fields: [almacenId], references: [id], onDelete: Cascade)
+  cantidad       Float    @default(0)
+  /// Costo promedio ponderado (centavos por unidad)
+  costoPromedio  Int      @default(0)
+  actualizadoEn  DateTime @updatedAt
+
+  @@unique([articuloId, almacenId])
+}
+
+/// Kárdex: cada entrada/salida de inventario (inmutable; las correcciones son ajustes).
+model MovimientoInventario {
+  id             String   @id @default(cuid())
+  empresaId      String
+  articuloId     String
+  articulo       Articulo @relation(fields: [articuloId], references: [id], onDelete: Cascade)
+  almacenId      String
+  almacen        Almacen  @relation(fields: [almacenId], references: [id], onDelete: Cascade)
+  /// "ENTRADA_COMPRA" | "SALIDA_VENTA" | "AJUSTE_ENTRADA" | "AJUSTE_SALIDA" | "INVENTARIO_INICIAL"
+  tipo           String
+  /// Positiva en entradas, negativa en salidas
+  cantidad       Float
+  costoUnitario  Int
+  /// Existencia y costo promedio resultantes
+  saldoCantidad  Float
+  saldoCostoPromedio Int
+  /// "RECEPCION" | "PEDIDO_VENTA" | "AJUSTE"
+  referenciaTipo String?
+  referenciaId   String?
+  motivo         String?
+  creadoPorId    String?
+  creadoEn       DateTime @default(now())
+
+  @@index([empresaId, creadoEn])
+  @@index([articuloId, creadoEn])
+}
+
+model Proveedor {
+  id               String   @id @default(cuid())
+  empresaId        String
+  empresa          Empresa  @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+  clave            String
+  rfc              String?
+  razonSocial      String
+  contacto         String?
+  correoElectronico String?
+  telefono         String?
+  diasCredito      Int      @default(30)
+  /// "CRITICO" | "ESTRATEGICO" | "NORMAL" (criticidad para priorizar pagos y riesgos de terceros)
+  criticidad       String   @default("NORMAL")
+  /// Ligado opcional al tercero del catálogo COFEPRIS/VUCEM (mismo proveedor, una sola fuente).
+  terceroId        String?
+  /// "ACTIVO" | "EN_EVALUACION" | "BLOQUEADO"
+  estado           String   @default("ACTIVO")
+  notas            String?
+  creadoEn         DateTime @default(now())
+  actualizadoEn    DateTime @updatedAt
+  ordenesCompra    OrdenCompra[]
+  cuentasPorPagar  CuentaPorPagar[]
+  articulos        Articulo[]
+
+  @@unique([empresaId, clave])
+}
+
+model OrdenCompra {
+  id                String   @id @default(cuid())
+  empresaId         String
+  empresa           Empresa  @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+  numero            Int
+  proveedorId       String
+  proveedor         Proveedor @relation(fields: [proveedorId], references: [id], onDelete: Restrict)
+  almacenId         String
+  almacen           Almacen  @relation(fields: [almacenId], references: [id], onDelete: Restrict)
+  /// "BORRADOR" | "POR_APROBAR" | "APROBADA" | "RECIBIDA_PARCIAL" | "RECIBIDA" | "RECHAZADA" | "CANCELADA"
+  estado            String   @default("BORRADOR")
+  fechaEntrega      DateTime?
+  subtotal          Int      @default(0)
+  iva               Int      @default(0)
+  total             Int      @default(0)
+  /// Nivel de aprobación requerido (0 = automática, 1 = aprobador, 2 = dirección)
+  nivelAprobacion   Int      @default(0)
+  creadoPorId       String?
+  enviadaEn         DateTime?
+  aprobadoPorId     String?
+  aprobadoEn        DateTime?
+  motivoRechazo     String?
+  notas             String?
+  creadoEn          DateTime @default(now())
+  actualizadoEn     DateTime @updatedAt
+  partidas          PartidaOrdenCompra[]
+  recepciones       Recepcion[]
+
+  @@unique([empresaId, numero])
+  @@index([empresaId, estado])
+}
+
+model PartidaOrdenCompra {
+  id               String   @id @default(cuid())
+  ordenCompraId    String
+  ordenCompra      OrdenCompra @relation(fields: [ordenCompraId], references: [id], onDelete: Cascade)
+  articuloId       String
+  articulo         Articulo @relation(fields: [articuloId], references: [id], onDelete: Restrict)
+  cantidad         Float
+  cantidadRecibida Float    @default(0)
+  costoUnitario    Int
+  tasaIvaBp        Int      @default(1600)
+  partidasRecepcion PartidaRecepcion[]
+
+  @@index([ordenCompraId])
+}
+
+/// Recepción de mercancía contra una OC: genera entradas al kárdex y la cuenta por pagar.
+model Recepcion {
+  id               String   @id @default(cuid())
+  empresaId        String
+  empresa          Empresa  @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+  numero           Int
+  ordenCompraId    String
+  ordenCompra      OrdenCompra @relation(fields: [ordenCompraId], references: [id], onDelete: Restrict)
+  almacenId        String
+  almacen          Almacen  @relation(fields: [almacenId], references: [id], onDelete: Restrict)
+  fecha            DateTime @default(now())
+  /// Factura del proveedor (UUID/folio CFDI) y su importe, para la conciliación a tres vías
+  folioFactura     String?
+  importeFactura   Int?
+  /// Resultado de la conciliación: "OK" | "DIFERENCIA_PRECIO" | "DIFERENCIA_CANTIDAD" | "SIN_FACTURA"
+  conciliacion     String   @default("SIN_FACTURA")
+  aTiempo          Boolean  @default(true)
+  recibidoPorId    String?
+  notas            String?
+  creadoEn         DateTime @default(now())
+  partidas         PartidaRecepcion[]
+  cuentaPorPagar   CuentaPorPagar?
+
+  @@unique([empresaId, numero])
+}
+
+model PartidaRecepcion {
+  id                 String   @id @default(cuid())
+  recepcionId        String
+  recepcion          Recepcion @relation(fields: [recepcionId], references: [id], onDelete: Cascade)
+  partidaOrdenId     String
+  partidaOrden       PartidaOrdenCompra @relation(fields: [partidaOrdenId], references: [id], onDelete: Restrict)
+  cantidadRecibida   Float
+  cantidadRechazada  Float    @default(0)
+  motivoRechazo      String?
+}
+
+model CuentaPorPagar {
+  id               String   @id @default(cuid())
+  empresaId        String
+  empresa          Empresa  @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+  proveedorId      String
+  proveedor        Proveedor @relation(fields: [proveedorId], references: [id], onDelete: Restrict)
+  recepcionId      String?  @unique
+  recepcion        Recepcion? @relation(fields: [recepcionId], references: [id], onDelete: SetNull)
+  folio            String
+  fechaEmision     DateTime
+  fechaVencimiento DateTime
+  total            Int
+  saldo            Int
+  /// "PENDIENTE" | "BLOQUEADA" (diferencia en conciliación) | "PARCIAL" | "PAGADA" | "CANCELADA"
+  estado           String   @default("PENDIENTE")
+  liberadaPorId    String?
+  creadoEn         DateTime @default(now())
+  pagos            PagoProveedor[]
+
+  @@index([empresaId, estado])
+}
+
+model PagoProveedor {
+  id               String   @id @default(cuid())
+  cuentaPorPagarId String
+  cuentaPorPagar   CuentaPorPagar @relation(fields: [cuentaPorPagarId], references: [id], onDelete: Cascade)
+  fecha            DateTime
+  monto            Int
+  /// "TRANSFERENCIA" | "CHEQUE" | "EFECTIVO" | "TARJETA"
+  metodo           String
+  referencia       String?
+  registradoPorId  String?
+  creadoEn         DateTime @default(now())
+}
+
+model Cliente {
+  id               String   @id @default(cuid())
+  empresaId        String
+  empresa          Empresa  @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+  clave            String
+  rfc              String?
+  razonSocial      String
+  contacto         String?
+  correoElectronico String?
+  telefono         String?
+  diasCredito      Int      @default(0)
+  /// Límite de crédito (centavos). 0 = solo contado.
+  limiteCredito    Int      @default(0)
+  /// "ACTIVO" | "SUSPENDIDO" (crédito retenido por cobranza)
+  estado           String   @default("ACTIVO")
+  notas            String?
+  creadoEn         DateTime @default(now())
+  actualizadoEn    DateTime @updatedAt
+  pedidos          PedidoVenta[]
+  cuentasPorCobrar CuentaPorCobrar[]
+
+  @@unique([empresaId, clave])
+}
+
+model PedidoVenta {
+  id                String   @id @default(cuid())
+  empresaId         String
+  empresa           Empresa  @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+  numero            Int
+  clienteId         String
+  cliente           Cliente  @relation(fields: [clienteId], references: [id], onDelete: Restrict)
+  almacenId         String
+  almacen           Almacen  @relation(fields: [almacenId], references: [id], onDelete: Restrict)
+  /// "BORRADOR" | "POR_AUTORIZAR" (decisión de crédito) | "CONFIRMADO" | "ENTREGADO" | "CANCELADO"
+  estado            String   @default("BORRADOR")
+  /// "CONTADO" | "CREDITO"
+  condicionPago     String   @default("CONTADO")
+  subtotal          Int      @default(0)
+  iva               Int      @default(0)
+  total             Int      @default(0)
+  /// Costo de lo vendido al entregar (centavos) para el margen bruto
+  costoVenta        Int      @default(0)
+  /// Resultado del modelo de crédito: JSON { puntaje, decision, motivos }
+  evaluacionCredito String?
+  autorizadoPorId   String?
+  creadoPorId       String?
+  entregadoEn       DateTime?
+  notas             String?
+  creadoEn          DateTime @default(now())
+  actualizadoEn     DateTime @updatedAt
+  partidas          PartidaVenta[]
+  cuentaPorCobrar   CuentaPorCobrar?
+
+  @@unique([empresaId, numero])
+  @@index([empresaId, estado])
+}
+
+model PartidaVenta {
+  id             String   @id @default(cuid())
+  pedidoId       String
+  pedido         PedidoVenta @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
+  articuloId     String
+  articulo       Articulo @relation(fields: [articuloId], references: [id], onDelete: Restrict)
+  cantidad       Float
+  precioUnitario Int
+  descuentoBp    Int      @default(0)
+  tasaIvaBp      Int      @default(1600)
+  costoUnitario  Int      @default(0)
+
+  @@index([pedidoId])
+}
+
+model CuentaPorCobrar {
+  id               String   @id @default(cuid())
+  empresaId        String
+  empresa          Empresa  @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+  clienteId        String
+  cliente          Cliente  @relation(fields: [clienteId], references: [id], onDelete: Restrict)
+  pedidoId         String?  @unique
+  pedido           PedidoVenta? @relation(fields: [pedidoId], references: [id], onDelete: SetNull)
+  folio            String
+  fechaEmision     DateTime
+  fechaVencimiento DateTime
+  total            Int
+  saldo            Int
+  /// "PENDIENTE" | "PARCIAL" | "PAGADA" | "INCOBRABLE" | "CANCELADA"
+  estado           String   @default("PENDIENTE")
+  creadoEn         DateTime @default(now())
+  cobros           Cobro[]
+  gestiones        GestionCobranza[]
+
+  @@index([empresaId, estado])
+}
+
+model Cobro {
+  id                String   @id @default(cuid())
+  cuentaPorCobrarId String
+  cuentaPorCobrar   CuentaPorCobrar @relation(fields: [cuentaPorCobrarId], references: [id], onDelete: Cascade)
+  fecha             DateTime
+  monto             Int
+  metodo            String
+  referencia        String?
+  registradoPorId   String?
+  creadoEn          DateTime @default(now())
+}
+
+/// Bitácora de gestión de cobranza (llamadas, correos, promesas de pago).
+model GestionCobranza {
+  id                String   @id @default(cuid())
+  cuentaPorCobrarId String
+  cuentaPorCobrar   CuentaPorCobrar @relation(fields: [cuentaPorCobrarId], references: [id], onDelete: Cascade)
+  /// "RECORDATORIO" | "LLAMADA" | "CORREO" | "VISITA" | "PROMESA_PAGO" | "SUSPENSION" | "JURIDICO"
+  tipo              String
+  nota              String
+  fechaPromesa      DateTime?
+  registradoPorId   String?
+  creadoEn          DateTime @default(now())
+}
+
+/// Tesorería: ingresos y egresos (cobros y pagos se registran automáticamente).
+model MovimientoTesoreria {
+  id             String   @id @default(cuid())
+  empresaId      String
+  empresa        Empresa  @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+  /// "INGRESO" | "EGRESO"
+  tipo           String
+  /// "COBRO_CLIENTE" | "PAGO_PROVEEDOR" | "NOMINA" | "IMPUESTOS" | "SERVICIOS" | "OTRO"
+  categoria      String
+  monto          Int
+  fecha          DateTime
+  concepto       String
+  referenciaTipo String?
+  referenciaId   String?
+  registradoPorId String?
+  creadoEn       DateTime @default(now())
+
+  @@index([empresaId, fecha])
+}
+
+/// Control de gobierno: objetivo COBIT 2019 (nivel de capacidad) o control del Anexo A de
+/// ISO/IEC 27001:2022 (declaración de aplicabilidad).
+model ControlGobierno {
+  id             String   @id @default(cuid())
+  empresaId      String
+  empresa        Empresa  @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+  /// "COBIT" | "ISO27001"
+  marco          String
+  clave          String
+  nombre         String
+  dominio        String
+  /// Proceso del ERP que lo implementa (COMPRAS, ALMACEN, ...)
+  procesoErp     String?
+  aplicable      Boolean  @default(true)
+  justificacion  String?
+  /// COBIT: nivel de capacidad 0-5. ISO: 0 = no implementado … 5 = optimizado.
+  nivelActual    Int      @default(0)
+  nivelObjetivo  Int      @default(3)
+  responsable    String?
+  evidencia      String?
+  revisadoEn     DateTime?
+  actualizadoEn  DateTime @updatedAt
+
+  @@unique([empresaId, marco, clave])
+}
+
+/// Registro de riesgos de seguridad de la información (ISO/IEC 27001 cláusula 6.1.2).
+model RiesgoSeguridad {
+  id             String   @id @default(cuid())
+  empresaId      String
+  empresa        Empresa  @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+  numero         Int
+  activo         String
+  amenaza        String
+  vulnerabilidad String
+  probabilidad   Int
+  impacto        Int
+  /// "MITIGAR" | "ACEPTAR" | "TRANSFERIR" | "EVITAR"
+  tratamiento    String   @default("MITIGAR")
+  controles      String?
+  responsable    String?
+  probabilidadResidual Int?
+  impactoResidual      Int?
+  /// "ABIERTO" | "EN_TRATAMIENTO" | "CERRADO"
+  estado         String   @default("ABIERTO")
+  creadoEn       DateTime @default(now())
+  actualizadoEn  DateTime @updatedAt
+
+  @@unique([empresaId, numero])
+}
+
+/// Gestión de servicios ITIL 4: incidentes, problemas, solicitudes y cambios.
+model TicketServicio {
+  id             String   @id @default(cuid())
+  empresaId      String
+  empresa        Empresa  @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+  numero         Int
+  /// "INCIDENTE" | "PROBLEMA" | "SOLICITUD" | "CAMBIO"
+  tipo           String
+  /// Servicio de negocio afectado (COMPRAS, ALMACEN, VENTAS, COBRANZA, FINANZAS, TI)
+  servicio       String
+  titulo         String
+  descripcion    String
+  impacto        Int
+  urgencia       Int
+  /// Prioridad ITIL 1 (crítica) … 5 (planificación)
+  prioridad      Int
+  /// Cambios: "ESTANDAR" | "NORMAL" | "EMERGENCIA"
+  tipoCambio     String?
+  /// "NUEVO" | "EN_PROCESO" | "PENDIENTE_APROBACION" | "APROBADO" | "RESUELTO" | "CERRADO" | "RECHAZADO"
+  estado         String   @default("NUEVO")
+  venceEn        DateTime
+  resueltoEn     DateTime?
+  solucion       String?
+  reportadoPorId String?
+  aprobadoPorId  String?
+  creadoEn       DateTime @default(now())
+  actualizadoEn  DateTime @updatedAt
+
+  @@unique([empresaId, numero])
+  @@index([empresaId, estado])
 }

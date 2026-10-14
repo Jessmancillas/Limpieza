@@ -24,6 +24,19 @@ y/o Importación de Fuentes de Radiación** ante la Ventanilla Única (VUCEM), t
    resolución, vigencias y alertas en el tablero.
 6. **Varias empresas (RFC)** con usuarios y roles (administrador, capturista, consulta) y bitácora.
 
+## ERP: arquitectura empresarial
+
+Además del trámite, la app incluye un **sistema centralizado** de compras (proveedores, órdenes de
+compra, recepción), almacén, ventas, cobranza y finanzas con **modelos de decisión** (matriz de
+autorización, conciliación a tres vías, EOQ/punto de reorden/ABC, scoring de crédito y de
+proveedores, cobranza por antigüedad, priorización de pagos) y gobernado con **COBIT 2019**
+(objetivos y tablero de KPIs), **ITIL 4** (mesa de servicio, SLA y CAB) e **ISO/IEC 27001:2022**
+(declaración de aplicabilidad, riesgos, segregación de funciones y bitácora).
+Ver [docs/arquitectura-empresarial.md](docs/arquitectura-empresarial.md).
+
+Los usuarios tienen, además del rol, **áreas funcionales** (Compras, Almacén, Ventas, Cobranza,
+Finanzas, Aprobador, Gobierno) que asigna un administrador en **Gobierno → Resumen y segregación**.
+
 ## Requisitos
 
 - Node.js 20.9 o superior (probado con 22).
@@ -114,6 +127,9 @@ src/lib/solicitudes/        validación, hoja de captura, días hábiles
 src/lib/vucem/              SOAP, digitalización eDocument, WS 260211, simulador
 src/lib/firma/              firma electrónica (node-forge, funciona en el navegador)
 src/lib/pdf/                conversión de anexos al formato VUCEM
+src/lib/erp/                ERP: modelos de decisión, permisos/segregación y servicios
+src/app/(app)/{erp,compras,almacen,ventas,cobranza,finanzas,gobierno}/   pantallas del ERP
+docs/arquitectura-empresarial.md   arquitectura, modelos de decisión y mapeo COBIT/ITIL/ISO
 ```
 
 ## Despliegue
