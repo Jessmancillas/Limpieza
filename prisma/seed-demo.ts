@@ -6,6 +6,8 @@ import { randomBytes, scryptSync } from "node:crypto";
 
 import type { PrismaClient } from "../src/generated/prisma/client";
 
+import { sembrarDemoErp } from "./seed-demo-erp";
+
 export const DEMO = {
   email: "demo@ejemplo.mx",
   password: "Demo-Permisos-2026",
@@ -144,6 +146,8 @@ export async function sembrarDemo(db: PrismaClient) {
       fabricanteId: fabricante.id,
     },
   });
+
+  await sembrarDemoErp(db, empresa.id, usuario.id);
 
   console.log(`  Demo creado: ${DEMO.email} / ${DEMO.password} (establecimiento ${establecimiento.id})`);
 }
